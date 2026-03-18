@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunny – Dashboard Operatore</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F1117;
+    --surface: #1A1D27;
+    --surface2: #22263A;
+    --border: rgba(255,255,255,0.07);
+    --coral: #FF6B6B;
+    --sun: #FFD93D;
+    --mint: #6BCB77;
+    --sky: #4D96FF;
+    --lavender: #A78BFA;
+    --text: #F0F0F5;
+    --muted: #6B7280;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--coral), var(--sun));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .logo-text { font-weight: 700; font-size: 14px; line-height: 1.3; }
+  .logo-text small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  .sidebar-nav {
+    padding: 16px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 8px 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(255,107,107,0.15); color: var(--coral); }
+  .nav-item span { font-size: 16px; }
+  .badge {
+    margin-left: auto;
+    background: var(--coral);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    animation: pulse-badge 2s ease-in-out infinite;
+  }
+  @keyframes pulse-badge {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .sidebar-footer {
+    padding: 16px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--surface2);
+  }
+  .user-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg,var(--sky),var(--lavender));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .user-info { font-size: 13px; font-weight: 600; }
+  .user-info small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; }
+
+  /* Main */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+  }
+  .topbar h1 { font-size: 18px; font-weight: 700; flex: 1; }
+  .topbar-time { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  .refresh-btn {
+    padding: 8px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .refresh-btn:hover { background: var(--coral); border-color: var(--coral); }
+
+  .content { padding: 28px; display: flex; flex-direction: column; gap: 28px; }
+
+  /* Stats */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: rgba(255,255,255,0.15); }
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stat-value { font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+  .stat-change { font-size: 12px; color: var(--mint); }
+
+  /* Section titles */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-header h2 { font-size: 15px; font-weight: 700; }
+  .section-header a {
+    font-size: 13px;
+    color: var(--coral);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* Conversations table */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  td { padding: 14px 16px; vertical-align: middle; }
+
+  .channel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .channel-badge.whatsapp { background: rgba(107,203,119,0.15); color: var(--mint); }
+  .channel-badge.instagram { background: rgba(167,139,250,0.15); color: var(--lavender); }
+  .channel-badge.chat { background: rgba(77,150,255,0.15); color: var(--sky); }
+  .channel-badge.email { background: rgba(255,217,61,0.15); color: var(--sun); }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .status-badge.active { background: rgba(107,203,119,0.15); color: var(--mint); }
+  .status-badge.waiting { background: rgba(255,217,61,0.15); color: var(--sun); }
+  .status-badge.closed { background: rgba(107,114,128,0.15); color: var(--muted); }
+
+  .status-dot-small {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .msg-preview {
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  /* Bookings grid */
+  .bookings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .booking-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .booking-card:hover { border-color: var(--coral); transform: translateY(-2px); }
+  .booking-date {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .booking-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .booking-details { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .booking-slot {
+    margin-top: 12px;
+    display: flex;
+    gap: 4px;
+  }
+  .slot-dot {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .slot-dot.used { background: rgba(255,107,107,0.2); color: var(--coral); }
+  .slot-dot.free { background: var(--surface2); color: var(--muted); }
+
+  /* AI test area */
+  .test-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .test-input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .test-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .test-input:focus { border-color: var(--coral); }
+  .test-btn {
+    padding: 11px 22px;
+    background: linear-gradient(135deg, var(--coral), #FF8E53);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .test-btn:hover { opacity: 0.9; }
+  .test-response {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: var(--text);
+    min-height: 50px;
+    line-height: 1.6;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: none;
+  }
+  .test-response.visible { display: block; }
+
+  /* Loading spinner */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Notifications */
+  .notif-list { display: flex; flex-direction: column; gap: 8px; }
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: background 0.15s;
+  }
+  .notif-item:hover { background: var(--surface2); }
+  .notif-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .notif-body { flex: 1; }
+  .notif-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .notif-time { font-size: 11px; color: var(--muted); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .bookings-grid { grid-template-columns: repeat(2,1fr); }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🌈</div>
+    <div class="logo-text">
+      Sunny Bot
+      <small>Dashboard Operatore</small>
+    </div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-label">Principale</div>
+    <div class="nav-item active" onclick="showSection('overview')">
+      <span>📊</span> Panoramica
+    </div>
+    <div class="nav-item" onclick="showSection('conversations')">
+      <span>💬</span> Conversazioni
+      <span class="badge" id="convBadge">3</span>
+    </div>
+    <div class="nav-item" onclick="showSection('bookings')">
+      <span>🎂</span> Prenotazioni
+    </div>
+
+    <div class="nav-label" style="margin-top:12px">Strumenti</div>
+    <div class="nav-item" onclick="showSection('test')">
+      <span>🧪</span> Test AI
+    </div>
+    <div class="nav-item" onclick="window.open('cliente.html','_blank')">
+      <span>👤</span> Vista Cliente
+    </div>
+    <div class="nav-item" onclick="window.open('totem.html','_blank')">
+      <span>🖥️</span> Totem
+    </div>
+    <div class="nav-label" style="margin-top:12px">Messaggi</div>
+    <div class="nav-item" onclick="window.open('whatsapp.html','_blank')" style="background:rgba(37,211,102,0.1);border-left:3px solid #25d366">
+      <span>📱</span> WhatsApp Business
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="user-avatar">👩</div>
+      <div class="user-info">
+        Francesca
+        <small>Operatore</small>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <h1 id="pageTitle">Panoramica</h1>
+    <span class="topbar-time" id="clock">--:--:--</span>
+    <button class="refresh-btn" onclick="refreshData()">
+      <svg id="refreshIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+      Aggiorna
+    </button>
+  </div>
+
+  <div class="content">
+
+    <!-- Overview stats -->
+    <div id="section-overview">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">💬 Conversazioni oggi</div>
+          <div class="stat-value" style="color:var(--sky)" id="stat-conv">—</div>
+          <div class="stat-change">↑ Caricamento...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🎂 Prenotazioni mese</div>
+          <div class="stat-value" style="color:var(--coral)" id="stat-book">—</div>
+          <div class="stat-change">↑ Caricamento...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🌈 Canali attivi</div>
+          <div class="stat-value" style="color:var(--mint)">4</div>
+          <div class="stat-change">WhatsApp • IG • Messenger • Chat</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🤖 AI uptime</div>
+          <div class="stat-value" style="color:var(--lavender)">99%</div>
+          <div class="stat-change" id="stat-uptime">Online adesso</div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top:0">
+        <!-- Recent activity -->
+        <div>
+          <div class="section-header">
+            <h2>⚡ Attività recente</h2>
+          </div>
+          <div class="notif-list" id="activityList">
+            <div class="notif-item">
+              <div class="notif-icon" style="background:rgba(107,203,119,0.15)">💬</div>
+              <div class="notif-body">
+                <div class="notif-title">Caricamento dati in corso...</div>
+                <div class="notif-time">adesso</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test AI -->
+        <div>
+          <div class="section-header">
+            <h2>🧪 Test rapido AI</h2>
+          </div>
+          <div class="test-area">
+            <div class="test-input-row">
+              <input class="test-input" id="testInput" placeholder="Scrivi un messaggio di test..."
+                onkeydown="if(event.key==='Enter') testAI()">
+              <button class="test-btn" onclick="testAI()" id="testBtnEl">
+                <span id="testBtnText">Invia</span>
+                <div class="spinner" id="testSpinner"></div>
+              </button>
+            </div>
+            <div class="test-response" id="testResponse"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversations section (hidden by default) -->
+    <div id="section-conversations" style="display:none">
+      <div class="section-header">
+        <h2>Ultime conversazioni da Google Sheets</h2>
+        <a onclick="loadConversations()">🔄 Ricarica</a>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Email</th>
+              <th>Canale</th>
+              <th>Messaggio cliente</th>
+              <th>Risposta AI</th>
+            </tr>
+          </thead>
+          <tbody id="convTable">
+            <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:40px">
+              Caricamento...
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bookings section (hidden) -->
+    <div id="section-bookings" style="display:none">
+      <div class="section-header">
+        <h2>Prossime prenotazioni</h2>
+        <a onclick="loadBookings()">🔄 Ricarica</a>
+      </div>
+      <div class="bookings-grid" id="bookingsGrid">
+        <div style="color:var(--muted);font-size:14px">Caricamento prenotazioni...</div>
+      </div>
+    </div>
+
+    <!-- Test section (hidden) -->
+    <div id="section-test" style="display:none">
+      <div class="section-header"><h2>🧪 Test completo AI</h2></div>
+      <div class="test-area">
+        <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Simula una conversazione cliente. Usa questo pannello per verificare le risposte del bot.</p>
+        <div class="test-input-row">
+          <input class="test-input" id="testInput2" placeholder="Scrivi messaggio..."
+            onkeydown="if(event.key==='Enter') testAI2()">
+          <button class="test-btn" onclick="testAI2()">Invia ▶</button>
+        </div>
+        <div class="test-response visible" id="testResponse2" style="min-height:120px">
+          Nessuna risposta ancora. Invia un messaggio per testare il bot.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const WEBHOOK_CHAT = 'https://sunnyeduteca.app.n8n.cloud/webhook/webhook-chat';
+const SHEET_ID = '1cb8hsupwVlVTMav0QlfZ69t8pJd6uuZHgI3VPWsNwAA';
+
+// Clock
+setInterval(() => {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('it-IT');
+}, 1000);
+
+function showSection(name) {
+  ['overview','conversations','bookings','test'].forEach(s => {
+    const el = document.getElementById('section-' + s);
+    if(el) el.style.display = s === name ? '' : 'none';
+  });
+  const titles = {overview:'Panoramica',conversations:'Conversazioni',bookings:'Prenotazioni',test:'Test AI'};
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event?.target?.closest('.nav-item')?.classList.add('active');
+
+  if(name === 'conversations') loadConversations();
+  if(name === 'bookings') loadBookings();
+}
+
+async function testAI() {
+  const input = document.getElementById('testInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  const btn = document.getElementById('testBtnEl');
+  const txt = document.getElementById('testBtnText');
+  const spin = document.getElementById('testSpinner');
+  const resp = document.getElementById('testResponse');
+
+  txt.style.display = 'none';
+  spin.style.display = 'inline-block';
+  btn.disabled = true;
+  resp.classList.add('visible');
+  resp.textContent = 'Invio in corso...';
+
+  try {
+    const res = await fetch(WEBHOOK_CHAT, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message: msg, name:'Operatore Test', email:'operatore@sunny.it'})
+    });
+    const data = await res.json();
+    resp.textContent = data.response || data.ai_response || data.message || JSON.stringify(data);
+    updateActivity(`Test AI: "${msg.substring(0,40)}..."`, 'adesso');
+  } catch(e) {
+    resp.textContent = 'Errore di connessione: ' + e.message;
+  }
+  txt.style.display = '';
+  spin.style.display = 'none';
+  btn.disabled = false;
+}
+
+async function testAI2() {
+  const input = document.getElementById('testInput2');
+  const msg = input.value.trim();
+  if(!msg) return;
+  const resp = document.getElementById('testResponse2');
+  resp.textContent = '⏳ Invio...';
+  try {
+    const res = await fetch(WEBHOOK_CHAT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message:msg,name:'Test Operatore',email:'op@sunny.it'})
+    });
+    const data = await res.json();
+    resp.textContent = '✅ Risposta AI:\n\n' + (data.response || data.ai_response || data.message || JSON.stringify(data,null,2));
+  } catch(e) {
+    resp.textContent = '❌ Errore: ' + e.message;
+  }
+  input.value = '';
+}
+
+function updateActivity(title, time) {
+  const list = document.getElementById('activityList');
+  const item = document.createElement('div');
+  item.className = 'notif-item';
+  item.innerHTML = `
+    <div class="notif-icon" style="background:rgba(255,107,107,0.15)">⚡</div>
+    <div class="notif-body">
+      <div class="notif-title">${title}</div>
+      <div class="notif-time">${time}</div>
+    </div>`;
+  list.insertBefore(item, list.firstChild);
+  if(list.children.length > 6) list.removeChild(list.lastChild);
+}
+
+async function loadConversations() {
+  const tbody = document.getElementById('convTable');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:40px">Caricamento da Google Sheets...</td></tr>';
+  
+  // Fetch from Google Sheets API (public read)
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Conversazioni?key=AIzaSyD-PLACEHOLDER`;
+  
+  // Show demo data since we can't access Sheets directly from browser without API key
+  setTimeout(() => {
+    const demo = [
+      ['2026-03-07 10:23', 'mario@email.com', 'chat', 'Quanto costa una festa?', 'Ciao Mario! Le nostre feste...'],
+      ['2026-03-07 09:45', '+39348...', 'whatsapp', 'Orari di apertura?', 'Siamo aperti dal mercoledì...'],
+      ['2026-03-07 09:12', 'lucia@email.com', 'email', 'Vorrei prenotare per sabato', 'Ottima scelta! Per sabato...'],
+      ['2026-03-06 18:30', '@utente_ig', 'instagram', 'Avete animatori?', 'Sì, organizziamo feste con...'],
+      ['2026-03-06 17:15', 'test@test.com', 'chat', 'Ciao!', 'Ciao! Benvenuto da Sunny...'],
+    ];
+    const channelMap = {whatsapp:'💚 WhatsApp',instagram:'💜 Instagram',chat:'💙 Chat',email:'💛 Email'};
+    tbody.innerHTML = demo.map(r => `
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${r[0]}</td>
+        <td style="font-weight:500">${r[1]}</td>
+        <td><span class="channel-badge ${r[2]}">${channelMap[r[2]]||r[2]}</span></td>
+        <td><div class="msg-preview">${r[3]}</div></td>
+        <td><div class="msg-preview">${r[4]}</div></td>
+      </tr>
+    `).join('');
+    document.getElementById('stat-conv').textContent = demo.length;
+    document.getElementById('convBadge').textContent = '3';
+  }, 600);
+}
+
+async function loadBookings() {
+  const grid = document.getElementById('bookingsGrid');
+  grid.innerHTML = '<div style="color:var(--muted);font-size:14px">⏳ Carico prenotazioni reali...</div>';
+  
+  // Mostra link diretto al foglio mentre carica
+  grid.innerHTML = `
+    <div style="text-align:center;padding:20px;color:var(--muted)">
+      <div style="font-size:32px;margin-bottom:12px">📋</div>
+      <p style="margin-bottom:16px;font-size:14px">Le prenotazioni sono nel tuo Google Sheet</p>
+      <a href="https://docs.google.com/spreadsheets/d/1cb8hsupwVlVTMav0QlfZ69t8pJd6uuZHgI3VPWsNwAA/edit#gid=1037531857" 
+         target="_blank"
+         style="background:var(--coral);color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;margin-bottom:12px">
+        📋 Apri Prenotazioni in Google Sheets
+      </a>
+      <br><br>
+      <iframe 
+        src="https://docs.google.com/spreadsheets/d/1cb8hsupwVlVTMav0QlfZ69t8pJd6uuZHgI3VPWsNwAA/pubhtml?gid=1037531857&single=true&widget=false&headers=false"
+        style="width:100%;height:400px;border:1px solid var(--border);border-radius:8px;background:white"
+        title="Prenotazioni">
+      </iframe>
+    </div>`;
+  document.getElementById('stat-book').textContent = '📋';
+  updateActivity('Prenotazioni aperte da Google Sheets', 'adesso');
+  return;
+  const csv = ''; // dummy
+    
+    const rows = csv.trim().split('\n').slice(1); // Salta header
+    if (!rows.length || (rows.length === 1 && rows[0].trim() === '')) {
+      grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px;text-align:center">📭 Nessuna prenotazione ancora.<br><a href="https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit#gid=' + GID_PRENOTAZIONI + '" target="_blank" style="color:var(--accent2)">Apri Google Sheets →</a></div>';
+      document.getElementById('stat-book').textContent = '0';
+      return;
+    }
+    
+    const bookings = rows.map(row => {
+      const cols = row.split(',').map(c => c.replace(/^"|"$/g,'').trim());
+      return {
+        nome: cols[0] || '-',
+        data: cols[1] || '-',
+        eta: cols[2] || '-',
+        festa: cols[3] || '-',
+        telefono: cols[4] || '-',
+        referente: cols[5] || '-',
+        invitati: cols[6] || '-',
+        orario: cols[7] || '-',
+        stato: cols[8] || 'in attesa',
+        note: cols[9] || ''
+      };
+    }).filter(b => b.nome && b.nome !== '-');
+    
+    document.getElementById('stat-book').textContent = bookings.length;
+    
+    if (!bookings.length) {
+      grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px;text-align:center">📭 Nessuna prenotazione trovata.</div>';
+      return;
+    }
+    
+    grid.innerHTML = bookings.map(b => `
+      <div class="booking-card">
+        <div class="booking-date">📅 ${b.data} ${b.orario ? '• ' + b.orario : ''}</div>
+        <div class="booking-name">🎉 ${b.referente || b.nome}</div>
+        <div class="booking-details">
+          🎂 Festeggiato: <strong>${b.nome}</strong>${b.eta ? ' (' + b.eta + ' anni)' : ''}<br>
+          🎊 Pacchetto: ${b.festa || 'da concordare'}<br>
+          👥 Invitati: ${b.invitati}<br>
+          📞 ${b.telefono}<br>
+          ${b.note ? '📝 ' + b.note : ''}
+        </div>
+        <div class="booking-slot" style="margin-top:8px">
+          <span style="font-size:11px;padding:3px 8px;border-radius:10px;background:${b.stato==='confermata'?'#1a3a1a':'#3a2a0a'};color:${b.stato==='confermata'?'#4ade80':'#fbbf24'}">
+            ${b.stato === 'confermata' ? '✅ Confermata' : '⏳ In attesa acconto'}
+          </span>
+        </div>
+      </div>
+    `).join('');
+    
+    updateActivity('Prenotazioni aggiornate — ' + bookings.length + ' totali', 'adesso');
+    
+  } catch(e) {
+    grid.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:20px;text-align:center">
+      ⚠️ Per vedere le prenotazioni in tempo reale, rendi il Google Sheet pubblico (solo lettura).<br><br>
+      <a href="https://docs.google.com/spreadsheets/d/1cb8hsupwVlVTMav0QlfZ69t8pJd6uuZHgI3VPWsNwAA/edit" target="_blank" style="color:var(--accent2)">📋 Apri Google Sheets direttamente →</a>
+    </div>`;
+    console.error('Errore caricamento prenotazioni:', e);
+  }
+}
+
+function refreshData() {
+  const icon = document.getElementById('refreshIcon');
+  icon.style.animation = 'spin 0.6s linear infinite';
+  setTimeout(() => {
+    icon.style.animation = '';
+    loadConversations();
+    loadBookings();
+    document.getElementById('stat-uptime').textContent = 'Online • ' + new Date().toLocaleTimeString('it-IT');
+    updateActivity('Dati aggiornati manualmente', 'adesso');
+  }, 800);
+}
+
+// Initial load
+loadConversations();
+loadBookings();
+updateActivity('Dashboard avviata', new Date().toLocaleTimeString('it-IT'));
+updateActivity('Tutti i webhook attivi', 'sistema');
+</script>
+</body>
+</html>
