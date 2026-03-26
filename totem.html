@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sunny on the Rainbow — Totem</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --sun:#FFD93D;--coral:#FF6B6B;--mint:#6BCB77;--sky:#4ECDC4;--purple:#C77DFF;--bg:#FFF8F0;--dark:#2D2D2D; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+  #screensaver{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#667eea,#764ba2 50%,#f093fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .5s}
+  #screensaver.hidden{opacity:0;pointer-events:none}
+  .ss-balloons{font-size:80px;margin-bottom:20px;animation:bounce 3s ease-in-out infinite}
+  .ss-logo{font-family:'Fredoka One',cursive;font-size:72px;color:#fff;text-align:center;line-height:1.1}
+  .ss-sub{font-family:'Nunito',sans-serif;font-size:26px;color:rgba(255,255,255,.85);margin-top:16px}
+  .ss-tap{font-family:'Nunito',sans-serif;font-size:22px;color:rgba(255,255,255,.6);margin-top:40px;animation:blink 2s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+  #app{width:100%;height:100%;display:flex;flex-direction:column}
+  header{background:linear-gradient(135deg,var(--coral),var(--purple));padding:20px 30px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,0,0,.15);flex-shrink:0}
+  .logo{font-family:'Fredoka One',cursive;font-size:36px;color:#fff}
+  .logo span{color:var(--sun)}
+  .clock{font-family:'Nunito',sans-serif;font-size:28px;font-weight:800;color:#fff}
+  main{flex:1;display:flex;overflow:hidden}
+  #home{width:100%;padding:30px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:24px}
+  .menu-card{border-radius:28px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;box-shadow:0 8px 30px rgba(0,0,0,.1);user-select:none}
+  .menu-card:active{transform:scale(.96)}
+  .menu-card .icon{font-size:70px;margin-bottom:16px}
+  .menu-card .label{font-family:'Fredoka One',cursive;font-size:30px;color:#fff;text-align:center;line-height:1.2}
+  .menu-card .sub{font-family:'Nunito',sans-serif;font-size:16px;color:rgba(255,255,255,.85);margin-top:8px;text-align:center}
+  .c1{background:linear-gradient(135deg,var(--coral),#ff9a5c)}
+  .c2{background:linear-gradient(135deg,var(--sky),#38b6ff)}
+  .c3{background:linear-gradient(135deg,var(--mint),#52e088)}
+  .c4{background:linear-gradient(135deg,var(--purple),#9b5de5)}
+  .screen{display:none;width:100%;flex-direction:column;overflow:hidden}
+  .screen.active{display:flex}
+  .screen-header{padding:20px 30px;display:flex;align-items:center;gap:20px;border-bottom:3px solid rgba(0,0,0,.06);flex-shrink:0;background:#fff}
+  .back-btn{background:var(--bg);border:none;border-radius:50%;width:56px;height:56px;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .back-btn:active{background:#e0e0e0}
+  .screen-title{font-family:'Fredoka One',cursive;font-size:32px;color:var(--dark)}
+  .content{flex:1;overflow-y:auto;padding:24px 30px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .form-group{display:flex;flex-direction:column;gap:8px}
+  .form-group.full{grid-column:1/-1}
+  label{font-family:'Nunito',sans-serif;font-weight:800;font-size:17px;color:var(--dark)}
+  input,select,textarea{border:3px solid #e8e8e8;border-radius:16px;padding:16px 20px;font-family:'Nunito',sans-serif;font-size:18px;color:var(--dark);background:#fff;outline:none;transition:border-color .2s;width:100%}
+  input:focus,select:focus,textarea:focus{border-color:var(--coral)}
+  textarea{resize:none;height:80px}
+  .slot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px}
+  .slot-btn{border:3px solid #e8e8e8;border-radius:16px;padding:16px 8px;background:#fff;cursor:pointer;text-align:center;transition:all .15s}
+  .slot-btn.selected{border-color:var(--coral);background:linear-gradient(135deg,var(--coral),#ff9a5c);color:#fff}
+  .slot-time{font-family:'Fredoka One',cursive;font-size:22px}
+  .slot-lbl{font-family:'Nunito',sans-serif;font-size:13px;margin-top:2px}
+  .slot-btn.selected .slot-lbl{color:rgba(255,255,255,.85)}
+  .submit-btn{background:linear-gradient(135deg,var(--coral),var(--purple));border:none;border-radius:20px;padding:22px;width:100%;margin-top:20px;font-family:'Fredoka One',cursive;font-size:26px;color:#fff;cursor:pointer;transition:transform .15s;box-shadow:0 6px 20px rgba(255,107,107,.4)}
+  .submit-btn:active{transform:scale(.98)}
+  #chat-messages{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+  .msg{max-width:75%;border-radius:20px;padding:14px 18px;font-family:'Nunito',sans-serif;font-size:18px;line-height:1.5}
+  .msg.bot{background:#fff;border:2px solid #f0f0f0;border-bottom-left-radius:4px;align-self:flex-start}
+  .msg.user{background:linear-gradient(135deg,var(--coral),var(--purple));color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+  .chat-input-area{padding:16px 24px;background:#fff;border-top:3px solid #f0f0f0;display:flex;gap:12px;flex-shrink:0}
+  #chat-input{flex:1;border:3px solid #e8e8e8;border-radius:16px;padding:16px 20px;font-family:'Nunito',sans-serif;font-size:18px;outline:none;transition:border-color .2s}
+  #chat-input:focus{border-color:var(--coral)}
+  .send-btn{background:linear-gradient(135deg,var(--coral),var(--purple));border:none;border-radius:16px;width:60px;height:60px;font-size:24px;cursor:pointer;color:#fff;flex-shrink:0;transition:transform .15s}
+  .send-btn:active{transform:scale(.92)}
+  .quick-actions{padding:0 24px 12px;display:flex;gap:10px;flex-wrap:wrap}
+  .quick-btn{border:2px solid var(--coral);border-radius:20px;padding:10px 16px;background:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--coral);cursor:pointer;transition:all .15s;white-space:nowrap}
+  .quick-btn:active{background:var(--coral);color:#fff}
+  .info-card{background:#fff;border-radius:24px;padding:24px;margin-bottom:20px;box-shadow:0 4px 16px rgba(0,0,0,.07);border-left:6px solid var(--coral)}
+  .info-card h3{font-family:'Fredoka One',cursive;font-size:24px;color:var(--dark);margin-bottom:12px}
+  .info-card p{font-family:'Nunito',sans-serif;font-size:17px;line-height:1.7;color:#555}
+  .info-slots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px}
+  .info-slot{border-radius:16px;padding:16px;text-align:center}
+  .info-slot .t{font-family:'Fredoka One',cursive;font-size:22px;color:#fff}
+  .info-slot .l{font-family:'Nunito',sans-serif;font-size:13px;color:rgba(255,255,255,.9);margin-top:4px}
+  #success-overlay{position:fixed;inset:0;z-index:50;background:linear-gradient(135deg,var(--mint),var(--sky));display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+  #success-overlay.show{opacity:1;pointer-events:all}
+  .success-icon{font-size:100px;animation:bounce 1s ease-in-out infinite}
+  .success-title{font-family:'Fredoka One',cursive;font-size:52px;color:#fff;margin-top:20px}
+  .success-sub{font-family:'Nunito',sans-serif;font-size:22px;color:rgba(255,255,255,.9);margin-top:10px;text-align:center;padding:0 40px}
+  .success-back{margin-top:40px;background:#fff;border:none;border-radius:20px;padding:18px 48px;font-family:'Fredoka One',cursive;font-size:26px;color:var(--mint);cursor:pointer}
+  .typing{display:inline-flex;gap:6px;padding:4px 0}
+  .typing span{width:10px;height:10px;background:#ccc;border-radius:50%;animation:typ 1s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes typ{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-10px)}}
+</style>
+</head>
+<body>
+<div id="screensaver" onclick="wakeUp()">
+  <div class="ss-balloons">🎈🎉🎂</div>
+  <div class="ss-logo">Sunny on<br>the Rainbow</div>
+  <div class="ss-sub">Il tuo centro famiglia</div>
+  <div class="ss-tap">👆 Tocca per iniziare</div>
+</div>
+<div id="app">
+  <header>
+    <div class="logo">☀️ Sunny on the <span>Rainbow</span></div>
+    <div class="clock" id="clock">--:--</div>
+  </header>
+  <main>
+    <div id="home">
+      <div class="menu-card c1" onclick="showScreen('booking-screen')">
+        <div class="icon">🎂</div><div class="label">Prenota Festa</div><div class="sub">Compleanno</div>
+      </div>
+      <div class="menu-card c2" onclick="showScreen('chat-screen')">
+        <div class="icon">💬</div><div class="label">Assistente AI</div><div class="sub">Chatta con noi</div>
+      </div>
+      <div class="menu-card c3" onclick="showScreen('info-screen')">
+        <div class="icon">ℹ️</div><div class="label">Info & Orari</div><div class="sub">Scopri Sunny</div>
+      </div>
+      <div class="menu-card c4" onclick="showScreen('pizza-screen')">
+        <div class="icon">🍕</div><div class="label">Pizzata</div><div class="sub">Serata in famiglia</div>
+      </div>
+    </div>
+
+    <!-- FESTA -->
+    <div class="screen" id="booking-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goHome()">←</button>
+        <div class="screen-title">🎂 Prenota la Festa di Compleanno</div>
+      </div>
+      <div class="content">
+        <div class="form-grid">
+          <div class="form-group"><label>Nome referente</label><input type="text" id="b-nome" placeholder="Il tuo nome"></div>
+          <div class="form-group"><label>Telefono</label><input type="tel" id="b-tel" placeholder="333 123 4567"></div>
+          <div class="form-group"><label>Data festa</label><input type="date" id="b-data"></div>
+          <div class="form-group"><label>N° partecipanti</label><input type="number" id="b-parti" placeholder="es. 20" min="1"></div>
+          <div class="form-group full">
+            <label>Scegli lo slot orario</label>
+            <div class="slot-grid">
+              <button class="slot-btn" onclick="selectSlot(this,'mattino','b')"><div class="slot-time">🌅</div><div class="slot-time">10:00</div><div class="slot-lbl">Mattino</div></button>
+              <button class="slot-btn" onclick="selectSlot(this,'pomeriggio','b')"><div class="slot-time">☀️</div><div class="slot-time">15:30</div><div class="slot-lbl">Pomeriggio</div></button>
+              <button class="slot-btn" onclick="selectSlot(this,'sera','b')"><div class="slot-time">🌙</div><div class="slot-time">20:00</div><div class="slot-lbl">Sera</div></button>
+            </div>
+          </div>
+          <div class="form-group full"><label>Note (tema, allergie, richieste)</label><textarea id="b-note" placeholder="Es: tema principesse, 2 bambini celiaci..."></textarea></div>
+        </div>
+        <button class="submit-btn" onclick="submitBooking('compleanno')">🎉 Invia Prenotazione</button>
+      </div>
+    </div>
+
+    <!-- PIZZATA -->
+    <div class="screen" id="pizza-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goHome()">←</button>
+        <div class="screen-title">🍕 Prenota Serata Pizzata</div>
+      </div>
+      <div class="content">
+        <div class="form-grid">
+          <div class="form-group"><label>Nome referente</label><input type="text" id="p-nome" placeholder="Il tuo nome"></div>
+          <div class="form-group"><label>Telefono</label><input type="tel" id="p-tel" placeholder="333 123 4567"></div>
+          <div class="form-group"><label>Data</label><input type="date" id="p-data"></div>
+          <div class="form-group"><label>N° persone</label><input type="number" id="p-pers" placeholder="es. 15" min="1"></div>
+          <div class="form-group full">
+            <label>Scegli lo slot orario</label>
+            <div class="slot-grid">
+              <button class="slot-btn" onclick="selectSlot(this,'mattino','p')"><div class="slot-time">🌅</div><div class="slot-time">10:00</div><div class="slot-lbl">Mattino</div></button>
+              <button class="slot-btn" onclick="selectSlot(this,'pomeriggio','p')"><div class="slot-time">☀️</div><div class="slot-time">15:30</div><div class="slot-lbl">Pomeriggio</div></button>
+              <button class="slot-btn" onclick="selectSlot(this,'sera','p')"><div class="slot-time">🌙</div><div class="slot-time">20:00</div><div class="slot-lbl">Sera</div></button>
+            </div>
+          </div>
+          <div class="form-group full"><label>Note speciali</label><textarea id="p-note" placeholder="Preferenze, allergie, richieste particolari..."></textarea></div>
+        </div>
+        <button class="submit-btn" onclick="submitBooking('pizzata')" style="background:linear-gradient(135deg,var(--purple),#9b5de5)">🍕 Invia Prenotazione</button>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="screen" id="chat-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goHome()">←</button>
+        <div class="screen-title">💬 Assistente AI</div>
+      </div>
+      <div style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+        <div class="quick-actions" style="padding:12px 24px">
+          <button class="quick-btn" onclick="sendQ('Come prenoto una festa di compleanno?')">🎂 Come prenoto?</button>
+          <button class="quick-btn" onclick="sendQ('Quali slot sono disponibili?')">📅 Slot liberi</button>
+          <button class="quick-btn" onclick="sendQ('Quali sono gli orari di apertura?')">🕐 Orari</button>
+          <button class="quick-btn" onclick="sendQ('Cosa offre il family bar?')">🍔 Family Bar</button>
+        </div>
+        <div id="chat-messages">
+          <div class="msg bot">Ciao! 🌈 Sono l'assistente di Sunny on the Rainbow. Posso aiutarti con prenotazioni di feste, pizzate ed eventi. Come posso aiutarti?</div>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="chat-input" placeholder="Scrivi un messaggio..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="send-btn" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="screen" id="info-screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goHome()">←</button>
+        <div class="screen-title">ℹ️ Info & Orari</div>
+      </div>
+      <div class="content">
+        <div class="info-card"><h3>🕐 Orari di apertura</h3><p>Mercoledì – Domenica: <strong>15:30 → 19:00</strong><br>Per aperture straordinarie segui il nostro canale WhatsApp!</p></div>
+        <div class="info-card" style="border-color:var(--sky)">
+          <h3>📅 Slot Feste & Eventi</h3>
+          <div class="info-slots">
+            <div class="info-slot" style="background:linear-gradient(135deg,var(--sky),#38b6ff)"><div class="t">🌅 10:00</div><div class="l">Mattino</div></div>
+            <div class="info-slot" style="background:linear-gradient(135deg,var(--coral),#ff9a5c)"><div class="t">☀️ 15:30</div><div class="l">Pomeriggio</div></div>
+            <div class="info-slot" style="background:linear-gradient(135deg,var(--purple),#9b5de5)"><div class="t">🌙 20:00</div><div class="l">Sera</div></div>
+          </div>
+          <p style="margin-top:12px">Ogni slot: <strong>fino a 3 feste</strong> contemporaneamente in spazi separati.</p>
+        </div>
+        <div class="info-card" style="border-color:var(--mint)"><h3>🎡 Le nostre aree</h3><p>🧒 Parco giochi coperto &nbsp;|&nbsp; 👶 Area 0-4 anni<br>⚽ Campetto multisport &nbsp;|&nbsp; 🐔 Mini farm animali<br>🌳 Parco esterno attrezzato &nbsp;|&nbsp; ☕ Family Bar</p></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="success-overlay">
+  <div class="success-icon">🎉</div>
+  <div class="success-title">Richiesta inviata!</div>
+  <div class="success-sub">Ti contatteremo presto al numero indicato per confermare la prenotazione.</div>
+  <button class="success-back" onclick="hideSuccess()">← Torna alla Home</button>
+</div>
+
+<script>
+const BOOKING_URL='https://sunnyeduteca.app.n8n.cloud/webhook/prenotazione-compleanno';
+const CHAT_URL='https://sunnyeduteca.app.n8n.cloud/webhook/webhook-chat';
+const slots={b:'',p:''};
+let ssTimer;
+
+function updateClock(){const n=new Date();document.getElementById('clock').textContent=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')}
+updateClock();setInterval(updateClock,1000);
+
+function resetTimer(){clearTimeout(ssTimer);ssTimer=setTimeout(()=>document.getElementById('screensaver').classList.remove('hidden'),90000)}
+function wakeUp(){document.getElementById('screensaver').classList.add('hidden');resetTimer()}
+document.addEventListener('touchstart',resetTimer);document.addEventListener('click',resetTimer);resetTimer();
+
+function showScreen(id){document.getElementById('home').style.display='none';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function goHome(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('home').style.display='grid';slots.b='';slots.p='';document.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('selected'))}
+function selectSlot(el,val,ns){document.querySelectorAll(`#${ns==='b'?'booking':'pizza'}-screen .slot-btn`).forEach(b=>b.classList.remove('selected'));el.classList.add('selected');slots[ns]=val}
+
+async function submitBooking(tipo){
+  const isP=tipo==='pizzata',ns=isP?'p':'b';
+  const nome=document.getElementById(ns+'-nome').value;
+  const tel=document.getElementById(ns+'-tel').value;
+  const data=document.getElementById(ns+'-data').value;
+  const pers=document.getElementById(isP?'p-pers':'b-parti').value;
+  const note=document.getElementById(ns+'-note').value;
+  const slot=slots[ns];
+  if(!nome||!tel||!data||!pers||!slot){alert('Compila tutti i campi e scegli uno slot!');return}
+  try{await fetch(BOOKING_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo_richiesta:'prenotazione',tipo_evento:tipo,nome,telefono:tel,data:data,orario:slot,partecipanti:pers,note,email:'totem@sunnyontherainbow.it'})})}catch(e){}
+  document.getElementById('success-overlay').classList.add('show')
+}
+function hideSuccess(){document.getElementById('success-overlay').classList.remove('show');goHome()}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-input');const msg=inp.value.trim();if(!msg)return;
+  inp.value='';addMsg(msg,'user');const t=addTyping();
+  try{const r=await fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,name:'Ospite Totem',email:'totem@sunny.it'})});const d=await r.json();t.remove();addMsg(d.response||d.ai_response||'Risposta non disponibile.','bot')}
+  catch(e){t.remove();addMsg('Scusa, ho un problema tecnico. Chiedi allo staff!','bot')}
+}
+function sendQ(txt){document.getElementById('chat-input').value=txt;sendChat()}
+function addMsg(txt,role){const c=document.getElementById('chat-messages');const d=document.createElement('div');d.className='msg '+role;d.textContent=txt;c.appendChild(d);c.scrollTop=c.scrollHeight;return d}
+function addTyping(){const c=document.getElementById('chat-messages');const d=document.createElement('div');d.className='msg bot';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';c.appendChild(d);c.scrollTop=c.scrollHeight;return d}
+</script>
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunny — WhatsApp Business</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0f0d;
+  --panel:#111a16;
+  --sidebar:#0d1511;
+  --bubble-in:#1a2e22;
+  --bubble-out:#1f5c38;
+  --accent:#25d366;
+  --accent2:#128c7e;
+  --text:#e8f5e0;
+  --text2:#8aad95;
+  --text3:#4a6b55;
+  --border:#1e3328;
+  --hover:#162820;
+  --read:#53bdeb;
+  --unread:#25d366;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* HEADER */
+.topbar{background:var(--sidebar);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
+.topbar-name{font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.topbar-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.status-label{font-size:12px;color:var(--text2)}
+.refresh-btn{background:var(--hover);border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;transition:all .2s}
+.refresh-btn:hover{background:var(--accent);color:#000;border-color:var(--accent)}
+
+/* MAIN LAYOUT */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:320px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:16px;border-bottom:1px solid var(--border)}
+.sidebar-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.search-box{position:relative}
+.search-box input{width:100%;background:var(--hover);border:1px solid var(--border);color:var(--text);padding:8px 12px 8px 32px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
+.contacts-list{flex:1;overflow-y:auto;padding:8px 0}
+.contacts-list::-webkit-scrollbar{width:4px}
+.contacts-list::-webkit-scrollbar-track{background:transparent}
+.contacts-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.contact-item{padding:12px 16px;cursor:pointer;transition:.15s;border-left:3px solid transparent;display:flex;align-items:center;gap:12px}
+.contact-item:hover{background:var(--hover)}
+.contact-item.active{background:var(--hover);border-left-color:var(--accent)}
+.contact-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;color:#fff}
+.contact-info{flex:1;min-width:0}
+.contact-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.contact-preview{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.contact-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.contact-time{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.contact-badge{background:var(--accent);color:#000;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
+
+/* CHAT AREA */
+.chat-area{flex:1;display:flex;flex-direction:column;background:var(--bg)}
+.chat-header{background:var(--panel);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff}
+.chat-name{font-size:15px;font-weight:600}
+.chat-status{font-size:12px;color:var(--text2)}
+.chat-actions{margin-left:auto;display:flex;gap:8px}
+.icon-btn{width:32px;height:32px;border-radius:6px;background:var(--hover);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.15s}
+.icon-btn:hover{background:var(--accent);color:#000;border-color:var(--accent)}
+
+.messages-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:6px}
+.messages-area::-webkit-scrollbar{width:4px}
+.messages-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.msg-row{display:flex;margin-bottom:2px}
+.msg-row.out{justify-content:flex-end}
+.msg-row.in{justify-content:flex-start}
+
+.msg-bubble{max-width:65%;padding:8px 12px;border-radius:12px;position:relative;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.msg-row.in .msg-bubble{background:var(--bubble-in);border-top-left-radius:3px}
+.msg-row.out .msg-bubble{background:var(--bubble-out);border-top-right-radius:3px}
+.msg-text{font-size:14px;line-height:1.5;word-break:break-word}
+.msg-meta{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:3px}
+.msg-time{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
+.msg-check{font-size:11px;color:var(--read)}
+.msg-sender{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:3px}
+
+.date-divider{text-align:center;margin:12px 0}
+.date-divider span{background:var(--panel);color:var(--text2);font-size:11px;padding:4px 12px;border-radius:10px;font-family:'DM Mono',monospace}
+
+.typing{display:flex;align-items:center;gap:4px;padding:10px 14px;background:var(--bubble-in);border-radius:12px;border-top-left-radius:3px;width:fit-content}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--text2);animation:typingDot 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* INPUT */
+.input-area{background:var(--panel);border-top:1px solid var(--border);padding:12px 16px;display:flex;align-items:flex-end;gap:10px;flex-shrink:0}
+.input-box{flex:1;background:var(--hover);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;resize:none;max-height:120px;line-height:1.5;transition:.2s}
+.input-box:focus{border-color:var(--accent)}
+.input-box::placeholder{color:var(--text3)}
+.send-btn{width:40px;height:40px;border-radius:10px;background:var(--accent);border:none;color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:.15s;flex-shrink:0}
+.send-btn:hover{background:#1db954;transform:scale(1.05)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* EMPTY STATE */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text3)}
+.empty-icon{font-size:48px;opacity:.3}
+.empty-title{font-size:16px;font-weight:500;color:var(--text2)}
+.empty-sub{font-size:13px;text-align:center;max-width:280px;line-height:1.6}
+
+/* NEW CHAT */
+.new-chat-btn{margin:8px 16px;background:var(--accent);color:#000;border:none;padding:8px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:.15s}
+.new-chat-btn:hover{background:#1db954}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;width:360px}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.modal input{width:100%;background:var(--hover);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px}
+.modal input:focus{border-color:var(--accent)}
+.modal input::placeholder{color:var(--text3)}
+.modal-btns{display:flex;gap:8px;margin-top:6px}
+.modal-btn{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;transition:.15s}
+.modal-btn.primary{background:var(--accent);color:#000}
+.modal-btn.primary:hover{background:#1db954}
+.modal-btn.secondary{background:var(--hover);color:var(--text);border:1px solid var(--border)}
+.modal-btn.secondary:hover{background:var(--border)}
+
+/* LOADING */
+.loader{text-align:center;padding:40px;color:var(--text3)}
+.spinner{display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--accent);color:var(--text);padding:10px 16px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* NOTIFICATION BADGE */
+.notif-active{background:var(--accent)!important;color:#000!important;border-color:var(--accent)!important}
+.notif-count{position:fixed;top:12px;right:120px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;z-index:50;display:none}
+
+/* SETTINGS PANEL */
+.settings-panel{position:fixed;top:56px;right:0;width:300px;background:var(--panel);border-left:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px;z-index:50;transform:translateX(100%);transition:.3s;border-bottom-left-radius:12px}
+.settings-panel.open{transform:translateX(0)}
+.settings-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.settings-row{margin-bottom:12px}
+.settings-label{font-size:12px;color:var(--text2);margin-bottom:4px}
+.settings-input{width:100%;background:var(--hover);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;outline:none}
+.settings-input:focus{border-color:var(--accent)}
+.settings-save{width:100%;background:var(--accent);color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;margin-top:4px}
+.settings-help{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4}
+.settings-status{font-size:12px;padding:6px 10px;border-radius:6px;margin-top:8px;text-align:center}
+.settings-status.ok{background:#1a3a1a;color:var(--accent);border:1px solid var(--accent)}
+.settings-status.err{background:#3a1a1a;color:#f87171;border:1px solid #ef4444}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">🌈</div>
+    <div>
+      <div class="topbar-name">Sunny on the Rainbow</div>
+      <div class="topbar-sub">WhatsApp Business Dashboard</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="status-dot"></div>
+    <span class="status-label">Online</span>
+    <button class="refresh-btn" onclick="loadConversations()">⟳ Aggiorna</button>
+    <button class="refresh-btn" id="notif-btn" onclick="toggleSettings()" title="Impostazioni notifiche">🔔 Notifiche</button>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-title">🔔 Notifiche</div>
+  
+  <div class="settings-row">
+    <div class="settings-label">📱 Telegram Chat ID</div>
+    <input class="settings-input" id="tg-chat-id" placeholder="es. 123456789" oninput="saveSettings()">
+    <div class="settings-help">Scrivi a @userinfobot su Telegram per ottenere il tuo ID</div>
+  </div>
+  
+  <div class="settings-row">
+    <div class="settings-label">🔑 Telegram Bot Token</div>
+    <input class="settings-input" id="tg-token" placeholder="es. 1234567890:AAF..." oninput="saveSettings()">
+    <div class="settings-help">Crea un bot con @BotFather su Telegram</div>
+  </div>
+  
+  <button class="settings-save" onclick="testTelegram()">📨 Testa notifica Telegram</button>
+  <div id="tg-status"></div>
+  
+  <div style="border-top:1px solid var(--border);margin:16px 0"></div>
+  
+  <div class="settings-title">🌐 Push Browser</div>
+  <div id="push-status" class="settings-help">Stato: non attivo</div>
+  <button class="settings-save" style="margin-top:8px" onclick="requestNotificationPermission()">Attiva notifiche browser</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Conversazioni</div>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Cerca contatto..." oninput="filterContacts(this.value)">
+      </div>
+    </div>
+    <button class="new-chat-btn" onclick="openNewChat()">✉️ Nuovo Messaggio</button>
+    <div class="contacts-list" id="contacts-list">
+      <div class="loader"><div class="spinner"></div><br>Carico conversazioni...</div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-area" id="chat-area">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">💬</div>
+      <div class="empty-title">Seleziona una conversazione</div>
+      <div class="empty-sub">Scegli un contatto dalla lista per vedere i messaggi o invia un nuovo messaggio</div>
+    </div>
+    <div id="chat-container" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none">
+      <div class="chat-header" id="chat-header"></div>
+      <div class="messages-area" id="messages-area"></div>
+      <div class="input-area">
+        <textarea class="input-box" id="msg-input" placeholder="Scrivi un messaggio..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW CHAT MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>✉️ Nuovo Messaggio WhatsApp</h3>
+    <input type="text" id="new-phone" placeholder="Numero telefono (es. 393331234567)">
+    <input type="text" id="new-name" placeholder="Nome contatto">
+    <textarea class="input-box" id="new-msg" placeholder="Messaggio..." style="width:100%;margin-bottom:10px" rows="3"></textarea>
+    <div class="modal-btns">
+      <button class="modal-btn secondary" onclick="closeModal()">Annulla</button>
+      <button class="modal-btn primary" onclick="sendNewChat()">Invia</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const N8N_CHAT = 'https://sunnyeduteca.app.n8n.cloud/webhook/webhook-chat';
+const N8N_WHATSAPP = 'https://sunnyeduteca.app.n8n.cloud/webhook/webhook-whatsapp';
+const N8N_CONVERSATIONS = 'https://sunnyeduteca.app.n8n.cloud/webhook/get-conversations';
+
+let conversations = {};
+let activeContact = null;
+let allContacts = [];
+let refreshInterval = null;
+
+// ─── LOAD CONVERSATIONS ───────────────────────────────────────────────────────
+async function loadConversations() {
+  try {
+    const r = await fetch(N8N_CONVERSATIONS, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({action: 'get_all'})
+    });
+    const data = await r.json();
+    const msgs = data.conversations || data.messages || data || [];
+    processMessages(msgs);
+  } catch(e) {
+    // Fallback: mostra dati demo se il webhook non è ancora configurato
+    showDemoData();
+  }
+}
+
+function processMessages(msgs) {
+  conversations = {};
+  msgs.forEach(m => {
+    const email = m['Email Cliente'] || m.email || 'unknown';
+    const tipo = m['Tipo'] || m.tipo || 'chat';
+    if (!conversations[email]) {
+      conversations[email] = {
+        email, tipo,
+        name: email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),
+        messages: [], unread: 0
+      };
+    }
+    conversations[email].messages.push({
+      text: m['Messaggio Cliente'] || '',
+      response: m['Risposta AI'] || '',
+      time: m['Timestamp'] || new Date().toISOString(),
+      tipo
+    });
+  });
+
+  allContacts = Object.values(conversations).sort((a,b) => {
+    const la = a.messages[a.messages.length-1]?.time || '';
+    const lb = b.messages[b.messages.length-1]?.time || '';
+    return lb.localeCompare(la);
+  });
+
+  renderContacts(allContacts);
+  if (activeContact) refreshActiveChat();
+}
+
+function showDemoData() {
+  const demo = [
+    {email:'393351910001@whatsapp',tipo:'whatsapp',name:'Giulia Rossi',messages:[
+      {text:'Ciao! Quanto costa la festa Sunny?',response:'La Festa Sunny costa 315€ il mercoledì/venerdì!',time:'2026-03-16T09:30:00.000Z'},
+      {text:'Perfetto! Posso prenotare per sabato 5 aprile?',response:'Certo! Ho bisogno di: data, orario, n° partecipanti e telefono.',time:'2026-03-16T09:32:00.000Z'}
+    ]},
+    {email:'393339876543@whatsapp',tipo:'whatsapp',name:'Marco Ferrari',messages:[
+      {text:'Avete posto sabato prossimo?',response:'Sì, sabato abbiamo ancora disponibilità! Vuoi prenotare?',time:'2026-03-16T08:15:00.000Z'}
+    ]},
+    {email:'cliente@test.it',tipo:'chat',name:'Cliente Web',messages:[
+      {text:'Quanto costa il laboratorio cooking?',response:'Il Laboratorio Cooking costa 18€ per bambino!',time:'2026-03-15T16:20:00.000Z'}
+    ]}
+  ];
+  conversations = {};
+  demo.forEach(c => { conversations[c.email] = c; });
+  allContacts = demo;
+  renderContacts(allContacts);
+  showToast('⚠️ Dati demo — configura il webhook get-conversations in n8n');
+}
+
+// ─── RENDER CONTACTS ──────────────────────────────────────────────────────────
+function renderContacts(contacts) {
+  const list = document.getElementById('contacts-list');
+  if (!contacts.length) {
+    list.innerHTML = '<div class="loader" style="color:var(--text3)">Nessuna conversazione</div>';
+    return;
+  }
+  list.innerHTML = contacts.map(c => {
+    const last = c.messages[c.messages.length-1];
+    const preview = last?.text || last?.response || '';
+    const time = last?.time ? formatTime(last.time) : '';
+    const initials = (c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const isWA = c.tipo === 'whatsapp';
+    return `<div class="contact-item ${activeContact?.email===c.email?'active':''}" onclick="openChat('${c.email}')">
+      <div class="contact-avatar">${initials}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name} ${isWA?'<span style="font-size:10px">📱</span>':''}</div>
+        <div class="contact-preview">${escHtml(preview.slice(0,50))}${preview.length>50?'...':''}</div>
+      </div>
+      <div class="contact-meta">
+        <div class="contact-time">${time}</div>
+        ${c.unread>0?`<div class="contact-badge">${c.unread}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterContacts(q) {
+  const filtered = q ? allContacts.filter(c =>
+    c.name.toLowerCase().includes(q.toLowerCase()) ||
+    c.email.toLowerCase().includes(q.toLowerCase())
+  ) : allContacts;
+  renderContacts(filtered);
+}
+
+// ─── OPEN CHAT ────────────────────────────────────────────────────────────────
+function openChat(email) {
+  activeContact = conversations[email];
+  if (!activeContact) return;
+  activeContact.unread = 0;
+  renderContacts(allContacts);
+
+  document.getElementById('empty-state').style.display = 'none';
+  const cc = document.getElementById('chat-container');
+  cc.style.display = 'flex';
+  cc.style.flexDirection = 'column';
+  cc.style.flex = '1';
+  cc.style.overflow = 'hidden';
+
+  const isWA = activeContact.tipo === 'whatsapp';
+  const initials = (activeContact.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('chat-header').innerHTML = `
+    <div class="chat-avatar">${initials}</div>
+    <div>
+      <div class="chat-name">${activeContact.name} ${isWA?'📱':''}</div>
+      <div class="chat-status">${isWA ? activeContact.email : activeContact.email}</div>
+    </div>
+    <div class="chat-actions">
+      <button class="icon-btn" title="Chiama" onclick="showToast('📞 Chiamata: '+activeContact.email)">📞</button>
+      <button class="icon-btn" title="Info" onclick="showToast('ℹ️ '+activeContact.email)">ℹ️</button>
+    </div>`;
+
+  renderMessages();
+}
+
+function refreshActiveChat() {
+  if (!activeContact) return;
+  activeContact = conversations[activeContact.email];
+  if (activeContact) renderMessages();
+}
+
+function renderMessages() {
+  const area = document.getElementById('messages-area');
+  const msgs = activeContact.messages;
+  let lastDate = '';
+  let html = '';
+
+  msgs.forEach(m => {
+    const d = new Date(m.time);
+    const dateStr = d.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'});
+    if (dateStr !== lastDate) {
+      html += `<div class="date-divider"><span>${dateStr}</span></div>`;
+      lastDate = dateStr;
+    }
+    const t = d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    if (m.text) {
+      html += `<div class="msg-row in">
+        <div class="msg-bubble">
+          <div class="msg-text">${escHtml(m.text)}</div>
+          <div class="msg-meta"><span class="msg-time">${t}</span></div>
+        </div></div>`;
+    }
+    if (m.response) {
+      html += `<div class="msg-row out">
+        <div class="msg-bubble">
+          <div class="msg-sender">🤖 SunnyBot</div>
+          <div class="msg-text">${escHtml(m.response)}</div>
+          <div class="msg-meta"><span class="msg-time">${t}</span><span class="msg-check">✓✓</span></div>
+        </div></div>`;
+    }
+  });
+  area.innerHTML = html;
+  area.scrollTop = area.scrollHeight;
+}
+
+// ─── SEND MESSAGE ─────────────────────────────────────────────────────────────
+async function sendMessage() {
+  if (!activeContact) return;
+  const inp = document.getElementById('msg-input');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = '';
+  inp.style.height = 'auto';
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+
+  // Aggiungi messaggio localmente
+  const newMsg = {text, response:'', time: new Date().toISOString()};
+  activeContact.messages.push(newMsg);
+  renderMessages();
+
+  // Mostra typing
+  const area = document.getElementById('messages-area');
+  const typingEl = document.createElement('div');
+  typingEl.className = 'msg-row out';
+  typingEl.innerHTML = `<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  area.appendChild(typingEl);
+  area.scrollTop = area.scrollHeight;
+
+  try {
+    const isWA = activeContact.tipo === 'whatsapp';
+    let body, url;
+
+    if (isWA) {
+      // Invia via WhatsApp API attraverso n8n
+      url = N8N_WHATSAPP;
+      body = {
+        entry: [{
+          changes: [{
+            value: {
+              messages: [{from: activeContact.email, text: {body: text}}],
+              contacts: [{profile: {name: activeContact.name}}]
+            }
+          }]
+        }]
+      };
+    } else {
+      url = N8N_CHAT;
+      body = {message: text, name: activeContact.name, email: activeContact.email};
+    }
+
+    const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    const data = await r.json();
+    const aiResp = data.ai_response || data.response || data['Risposta AI'] || '';
+
+    typingEl.remove();
+    newMsg.response = aiResp;
+    renderMessages();
+    showToast('✅ Messaggio inviato');
+  } catch(e) {
+    typingEl.remove();
+    newMsg.response = '⚠️ Errore invio';
+    renderMessages();
+    showToast('❌ Errore di rete');
+  }
+  btn.disabled = false;
+}
+
+// ─── NEW CHAT ─────────────────────────────────────────────────────────────────
+function openNewChat() { document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+async function sendNewChat() {
+  const phone = document.getElementById('new-phone').value.trim();
+  const name = document.getElementById('new-name').value.trim() || phone;
+  const msg = document.getElementById('new-msg').value.trim();
+  if (!phone || !msg) { showToast('⚠️ Compila numero e messaggio'); return; }
+
+  closeModal();
+  // Crea conversazione locale
+  if (!conversations[phone]) {
+    conversations[phone] = {email: phone, tipo:'whatsapp', name, messages:[], unread:0};
+    allContacts.unshift(conversations[phone]);
+  }
+  openChat(phone);
+  document.getElementById('msg-input').value = msg;
+  sendMessage();
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+function formatTime(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 86400000) return d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if (diff < 604800000) return d.toLocaleDateString('it-IT',{weekday:'short'});
+  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── NOTIFICATIONS ───────────────────────────────────────────────────────────
+let notifSettings = JSON.parse(localStorage.getItem('sunnyNotifSettings') || '{}');
+let lastMsgCount = 0;
+let pushEnabled = false;
+
+function loadSettings() {
+  if (notifSettings.tgChatId) document.getElementById('tg-chat-id').value = notifSettings.tgChatId;
+  if (notifSettings.tgToken) document.getElementById('tg-token').value = notifSettings.tgToken;
+  updatePushStatus();
+}
+
+function saveSettings() {
+  notifSettings.tgChatId = document.getElementById('tg-chat-id').value;
+  notifSettings.tgToken = document.getElementById('tg-token').value;
+  localStorage.setItem('sunnyNotifSettings', JSON.stringify(notifSettings));
+}
+
+function toggleSettings() {
+  const panel = document.getElementById('settings-panel');
+  panel.classList.toggle('open');
+}
+
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) {
+    showToast('❌ Browser non supporta notifiche push');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  pushEnabled = perm === 'granted';
+  updatePushStatus();
+  if (pushEnabled) {
+    showToast('✅ Notifiche browser attivate!');
+    document.getElementById('notif-btn').classList.add('notif-active');
+  } else {
+    showToast('❌ Permesso notifiche negato');
+  }
+}
+
+function updatePushStatus() {
+  const el = document.getElementById('push-status');
+  if (!el) return;
+  if (!('Notification' in window)) {
+    el.textContent = 'Stato: browser non supportato';
+  } else if (Notification.permission === 'granted') {
+    el.textContent = '✅ Attive';
+    pushEnabled = true;
+    document.getElementById('notif-btn').classList.add('notif-active');
+  } else if (Notification.permission === 'denied') {
+    el.textContent = '❌ Bloccate — sblocca nelle impostazioni browser';
+  } else {
+    el.textContent = 'Stato: non attivate';
+  }
+}
+
+async function testTelegram() {
+  const chatId = document.getElementById('tg-chat-id').value.trim();
+  const token = document.getElementById('tg-token').value.trim();
+  if (!chatId || !token) {
+    document.getElementById('tg-status').innerHTML = '<div class="settings-status err">⚠️ Inserisci Chat ID e Token</div>';
+    return;
+  }
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: '🌈 *Sunny on the Rainbow* — Test notifica! Il sistema di notifiche è attivo ✅',
+        parse_mode: 'Markdown'
+      })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById('tg-status').innerHTML = '<div class="settings-status ok">✅ Telegram funziona!</div>';
+      saveSettings();
+      showToast('✅ Notifica Telegram inviata!');
+    } else {
+      document.getElementById('tg-status').innerHTML = `<div class="settings-status err">❌ ${d.description}</div>`;
+    }
+  } catch(e) {
+    document.getElementById('tg-status').innerHTML = '<div class="settings-status err">❌ Errore di rete</div>';
+  }
+}
+
+async function sendTelegramNotif(name, message, channel) {
+  const chatId = notifSettings.tgChatId;
+  const token = notifSettings.tgToken;
+  if (!chatId || !token) return;
+  const icon = channel === 'whatsapp' ? '📱' : '💬';
+  const text = `${icon} *Nuovo messaggio da ${name}*
+
+"${message.slice(0,200)}${message.length>200?'...':''}"`;
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({chat_id: chatId, text, parse_mode: 'Markdown'})
+    });
+  } catch(e) {}
+}
+
+function sendBrowserNotif(name, message) {
+  if (!pushEnabled || Notification.permission !== 'granted') return;
+  const n = new Notification(`🌈 Nuovo messaggio da ${name}`, {
+    body: message.slice(0, 100),
+    icon: 'https://sunnyeduteca-hue.github.io/sunny-prenotazione/favicon.ico',
+    badge: 'https://sunnyeduteca-hue.github.io/sunny-prenotazione/favicon.ico',
+    tag: 'sunny-msg',
+    renotify: true
+  });
+  n.onclick = () => { window.focus(); n.close(); };
+}
+
+function checkNewMessages(newContacts) {
+  if (lastMsgCount === 0) { 
+    lastMsgCount = newContacts.reduce((s,c)=>s+c.messages.length,0);
+    return;
+  }
+  newContacts.forEach(c => {
+    const old = conversations[c.email];
+    const oldCount = old ? old.messages.length : 0;
+    if (c.messages.length > oldCount) {
+      const lastMsg = c.messages[c.messages.length-1];
+      const msgText = lastMsg.text || lastMsg.response || '';
+      if (c.email !== activeContact?.email) c.unread = (c.unread||0) + (c.messages.length - oldCount);
+      sendBrowserNotif(c.name, msgText);
+      sendTelegramNotif(c.name, msgText, c.tipo);
+      showToast(`📩 Nuovo messaggio da ${c.name}`);
+    }
+  });
+  lastMsgCount = newContacts.reduce((s,c)=>s+c.messages.length,0);
+}
+
+// Intercept processMessages to check new messages
+const _origProcess = processMessages;
+// Override dopo init
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadConversations();
+setInterval(loadConversations, 30000);
+// Carica settings dopo DOM ready
+setTimeout(loadSettings, 100);
+// Check push permission
+if (Notification.permission === 'granted') pushEnabled = true;
+</script>
+</body>
+</html>
