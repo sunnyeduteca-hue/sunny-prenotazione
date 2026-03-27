@@ -486,7 +486,13 @@ async function sendMessage() {
       };
     } else {
       url = N8N_CHAT;
-      body = {message: text, name: activeContact.name, email: activeContact.email};
+      body = {
+  nome: activeContact.name,
+  contatto: activeContact.email,
+  messaggio: text,
+  canale: activeContact.tipo,
+  timestamp: new Date().toISOString()
+};
     }
 
     const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
