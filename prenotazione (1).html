@@ -490,7 +490,7 @@ async function sendChat() {
     let reply = '';
     try {
       const d = JSON.parse(text);
-      reply = d.ai_response || d.response || d['Risposta AI'] || d.output || '';
+      reply = data.reply ;
     } catch {
       if (text && text.length > 0 && text.length < 2000) reply = text;
     }
