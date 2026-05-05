@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Operatore · Sunny on the Rainbow</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F0F1A;
+  --surface: #1A1A2E;
+  --surface2: #16213E;
+  --border: rgba(255,255,255,0.08);
+  --sun: #FFB800;
+  --coral: #FF6B6B;
+  --mint: #4ECDC4;
+  --sky: #45B7D1;
+  --purple: #A855F7;
+  --grass: #22C55E;
+  --text: #F0F0FF;
+  --muted: rgba(240,240,255,0.45);
+  --card-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  background: linear-gradient(90deg, var(--coral), var(--sun));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.header-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.refresh-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.refresh-btn:hover { background: rgba(255,255,255,0.12); }
+.last-update { font-size: 12px; color: var(--muted); }
+
+/* LAYOUT */
+.layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 57px); }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  overflow-y: auto;
+}
+.sidebar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+/* STATS CARDS */
+.stat-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: rgba(255,255,255,0.16); }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  margin: 4px 0 0;
+  line-height: 1;
+}
+.stat-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* FILTRI */
+.filter-group { margin-bottom: 20px; }
+.filter-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 8px; display: block; }
+.filter-select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+.filter-select:focus { border-color: var(--mint); }
+.filter-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+.filter-input::placeholder { color: var(--muted); }
+.filter-input:focus { border-color: var(--mint); }
+
+/* MAIN */
+.main { padding: 24px; overflow-y: auto; }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  width: fit-content;
+}
+.tab {
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--muted);
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.tab.active { background: var(--coral); color: white; }
+.tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.06); }
+
+/* CALENDARIO VISTA */
+.cal-view { margin-bottom: 24px; }
+.cal-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cal-view-month {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+.cal-nav-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.cal-nav-btn:hover { background: rgba(255,255,255,0.1); }
+.cal-grid-view {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-day-hdr {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 6px 0;
+  text-transform: uppercase;
+}
+.cal-cell {
+  min-height: 80px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  position: relative;
+}
+.cal-cell:hover { border-color: rgba(255,255,255,0.2); }
+.cal-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+.cal-cell.disabled { opacity: 0.3; cursor: not-allowed; }
+.cal-cell.today { border-color: var(--sun) !important; }
+.cal-cell.selected { border-color: var(--mint) !important; }
+.cal-cell-day {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.cal-cell.has-events .cal-cell-day { color: var(--text); }
+.cal-event-dot {
+  font-size: 10px;
+  background: rgba(255,107,107,0.2);
+  color: var(--coral);
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-top: 2px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-event-dot.pizzata { background: rgba(255,184,0,0.2); color: var(--sun); }
+.cal-event-dot.slot-ok { background: rgba(34,197,94,0.15); color: var(--grass); }
+
+/* PRENOTAZIONI LIST */
+.prenot-grid {
+  display: grid;
+  gap: 12px;
+}
+.prenot-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: start;
+  transition: border-color 0.2s, transform 0.15s;
+  cursor: pointer;
+}
+.prenot-card:hover { border-color: rgba(255,255,255,0.16); transform: translateY(-1px); }
+.prenot-card.expanded { border-color: var(--mint); }
+.prenot-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.prenot-icon.compleanno { background: rgba(255,107,107,0.15); }
+.prenot-icon.pizzata { background: rgba(255,184,0,0.15); }
+.prenot-icon.evento { background: rgba(168,85,247,0.15); }
+.prenot-icon.gioco { background: rgba(78,205,196,0.15); }
+.prenot-main { min-width: 0; }
+.prenot-nome {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prenot-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.prenot-meta strong { color: var(--text); }
+.prenot-right { text-align: right; flex-shrink: 0; }
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.badge.attesa { background: rgba(255,184,0,0.15); color: var(--sun); }
+.badge.confermata { background: rgba(34,197,94,0.15); color: var(--grass); }
+.badge.annullata { background: rgba(255,107,107,0.15); color: var(--coral); }
+.prenot-slot {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* EXPANDED DETAIL */
+.prenot-detail {
+  display: none;
+  grid-column: 1 / -1;
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 4px;
+}
+.prenot-card.expanded .prenot-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 600px) { .prenot-card.expanded .prenot-detail { grid-template-columns: 1fr; } }
+.detail-row { font-size: 13px; }
+.detail-row .dk { color: var(--muted); font-weight: 500; }
+.detail-row .dv { color: var(--text); font-weight: 600; }
+.detail-actions { display: flex; gap: 8px; margin-top: 12px; grid-column: 1/-1; }
+.action-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.action-btn:hover { opacity: 0.85; }
+.action-btn.confirm { background: var(--grass); color: white; }
+.action-btn.cancel { background: var(--coral); color: white; }
+.action-btn.call { background: var(--sky); color: white; }
+.action-btn.email { background: var(--purple); color: white; }
+
+/* SLOT OVERVIEW */
+.slot-overview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.slot-ov-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--muted);
+}
+.slot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.slot-row:last-child { border: none; }
+.slot-info { font-size: 13px; font-weight: 600; }
+.slot-bar-wrap { flex: 1; margin: 0 12px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.slot-bar { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.slot-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; display: block; }
+.empty-state p { font-size: 14px; }
+
+/* LOADING */
+.loading { text-align: center; padding: 40px; color: var(--muted); }
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: var(--coral);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--grass);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<header>
+  <div>
+    <div class="logo">🌈 Sunny on the Rainbow</div>
+    <div class="header-sub">Dashboard Operatore</div>
+  </div>
+  <div class="header-right">
+    <div class="last-update" id="lastUpdate">—</div>
+    <button class="refresh-btn" onclick="loadData()">↻ Aggiorna</button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-title">Statistiche</div>
+
+    <div class="stat-card">
+      <div class="stat-label">Totale Prenotazioni</div>
+      <div class="stat-value" id="statTotale">—</div>
+      <div class="stat-sub">tutte le date</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Questo mese</div>
+      <div class="stat-value" id="statMese" style="color:var(--coral)">—</div>
+      <div class="stat-sub" id="statMeseLabel">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Prossimi 7 giorni</div>
+      <div class="stat-value" id="statSettimana" style="color:var(--mint)">—</div>
+      <div class="stat-sub">da confermare</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">In attesa conferma</div>
+      <div class="stat-value" id="statAttesa" style="color:var(--sun)">—</div>
+      <div class="stat-sub">richiede azione</div>
+    </div>
+
+    <div style="height:20px"></div>
+    <div class="sidebar-title">Filtri</div>
+
+    <div class="filter-group">
+      <label class="filter-label">Stato</label>
+      <select class="filter-select" id="filtroStato" onchange="applyFilters()">
+        <option value="">Tutti</option>
+        <option value="in_attesa">In attesa</option>
+        <option value="confermata">Confermata</option>
+        <option value="annullata">Annullata</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Tipo evento</label>
+      <select class="filter-select" id="filtroTipo" onchange="applyFilters()">
+        <option value="">Tutti</option>
+        <option value="festa_compleanno">🎂 Compleanno</option>
+        <option value="pizzata">🍕 Pizzata</option>
+        <option value="evento_privato">🎊 Evento Privato</option>
+        <option value="pacchetto_gioco">🎠 Pacchetto Gioco</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Cerca per nome</label>
+      <input class="filter-input" id="filtroNome" placeholder="Es. Mario Rossi..." oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Mese</label>
+      <select class="filter-select" id="filtroMese" onchange="applyFilters()">
+        <option value="">Tutti i mesi</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('lista', this)">📋 Lista</button>
+      <button class="tab" onclick="switchTab('calendario', this)">📅 Calendario</button>
+    </div>
+
+    <!-- TAB LISTA -->
+    <div id="tabLista">
+      <div id="slotOverview" style="display:none">
+        <!-- Slot overview per data selezionata -->
+      </div>
+      <div id="listaContainer">
+        <div class="loading"><div class="spinner"></div>Caricamento...</div>
+      </div>
+    </div>
+
+    <!-- TAB CALENDARIO -->
+    <div id="tabCalendario" style="display:none">
+      <div class="cal-view">
+        <div class="cal-view-header">
+          <button class="cal-nav-btn" onclick="dashPrevMonth()">←</button>
+          <div class="cal-view-month" id="dashCalMonth"></div>
+          <button class="cal-nav-btn" onclick="dashNextMonth()">→</button>
+        </div>
+        <div class="cal-grid-view" id="dashCalGrid"></div>
+      </div>
+      <div id="dayDetail" style="display:none">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;color:var(--muted);" id="dayDetailTitle"></div>
+        <div id="dayDetailContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  WEBHOOK_BASE: 'https://sunnyeduteca.app.n8n.cloud/webhook',
+  SLOTS: {
+    mattino: { nome: 'Mattino', emoji: '🌅', orario: '10:00–13:00' },
+    pomeriggio: { nome: 'Pomeriggio', emoji: '☀️', orario: '16:30–19:00' },
+    sera: { nome: 'Sera', emoji: '🌙', orario: '19:00–22:00' }
+  },
+  TIPO_ICONS: {
+    festa_compleanno: '🎂',
+    pizzata: '🍕',
+    evento_privato: '🎊',
+    pacchetto_gioco: '🎠',
+    prenotazione: '🎂'
+  },
+  MESI: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+          'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']
+};
+
+let allPrenotazioni = [];
+let filteredPrenotazioni = [];
+let dashYear = new Date().getFullYear();
+let dashMonth = new Date().getMonth();
+let currentTab = 'lista';
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+async function loadData() {
+  try {
+    const res = await fetch(`${CONFIG.WEBHOOK_BASE}/get-prenotazioni`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list' })
+    });
+    const data = await res.json();
+    allPrenotazioni = normalizeData(data);
+    document.getElementById('lastUpdate').textContent = 'Aggiornato: ' + new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+    updateStats();
+    updateMeseFiltro();
+    applyFilters();
+    if (currentTab === 'calendario') renderDashCalendar();
+    showToast('✅ Dati aggiornati');
+  } catch(e) {
+    document.getElementById('listaContainer').innerHTML = `
+      <div class="empty-state">
+        <span class="icon">⚠️</span>
+        <p>Impossibile caricare i dati.<br>Verifica la connessione al webhook n8n.</p>
+      </div>`;
+  }
+}
+
+function normalizeData(data) {
+  let arr = Array.isArray(data) ? data : [];
+  // Gestisce risposte diverse da n8n
+  if (!Array.isArray(data) && data && typeof data === 'object') {
+    arr = data.prenotazioni || data.data || Object.values(data);
+    if (!Array.isArray(arr)) arr = [data];
+  }
+  return arr.map((p, i) => ({
+    id: p.id || p.ID || i,
+    nome: p.nome_cliente || p.nome || p.Nome || '—',
+    email: p.email_cliente || p.email || p.Email || '',
+    telefono: p.telefono || p.Telefono || '',
+    data: p.data_compleanno || p.data || p.Data || '',
+    orario: p.orario || p.Orario || '',
+    tipo: p.tipo_evento || p.tipo || p.tipo_richiesta || 'festa_compleanno',
+    partecipanti: p.numero_partecipanti || p.partecipanti || '',
+    stato: (p.stato || p.Stato || 'in_attesa').toLowerCase().replace(' ', '_'),
+    note: p.note || p.Note || '',
+    festeggiato: p.nome_festeggiato || '',
+    timestamp: p.Timestamp || p.timestamp || '',
+  }));
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  const now = new Date();
+  const meseCorrente = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const in7gg = new Date(now.getTime() + 7 * 86400000);
+
+  document.getElementById('statTotale').textContent = allPrenotazioni.length;
+
+  const mese = allPrenotazioni.filter(p => p.data && p.data.startsWith(meseCorrente));
+  document.getElementById('statMese').textContent = mese.length;
+  document.getElementById('statMeseLabel').textContent = CONFIG.MESI[now.getMonth()];
+
+  const prossimi = allPrenotazioni.filter(p => {
+    if (!p.data) return false;
+    const d = new Date(p.data + 'T12:00:00');
+    return d >= now && d <= in7gg;
+  });
+  document.getElementById('statSettimana').textContent = prossimi.length;
+
+  const attesa = allPrenotazioni.filter(p => p.stato === 'in_attesa');
+  document.getElementById('statAttesa').textContent = attesa.length;
+}
+
+function updateMeseFiltro() {
+  const mesi = [...new Set(allPrenotazioni.map(p => p.data ? p.data.substr(0,7) : '').filter(Boolean))].sort();
+  const sel = document.getElementById('filtroMese');
+  const curr = sel.value;
+  sel.innerHTML = '<option value="">Tutti i mesi</option>';
+  mesi.forEach(m => {
+    const [y, mo] = m.split('-');
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = `${CONFIG.MESI[parseInt(mo)-1]} ${y}`;
+    sel.appendChild(opt);
+  });
+  sel.value = curr;
+}
+
+// ============================================================
+// FILTERS
+// ============================================================
+function applyFilters() {
+  const stato = document.getElementById('filtroStato').value;
+  const tipo = document.getElementById('filtroTipo').value;
+  const nome = document.getElementById('filtroNome').value.toLowerCase();
+  const mese = document.getElementById('filtroMese').value;
+
+  filteredPrenotazioni = allPrenotazioni.filter(p => {
+    if (stato && p.stato !== stato) return false;
+    if (tipo && p.tipo !== tipo) return false;
+    if (nome && !p.nome.toLowerCase().includes(nome)) return false;
+    if (mese && !(p.data || '').startsWith(mese)) return false;
+    return true;
+  });
+
+  // Ordina per data più recente prima
+  filteredPrenotazioni.sort((a, b) => {
+    if (!a.data && !b.data) return 0;
+    if (!a.data) return 1;
+    if (!b.data) return -1;
+    return a.data > b.data ? -1 : 1;
+  });
+
+  renderLista();
+}
+
+// ============================================================
+// LISTA
+// ============================================================
+function renderLista() {
+  const container = document.getElementById('listaContainer');
+  if (filteredPrenotazioni.length === 0) {
+    container.innerHTML = `<div class="empty-state"><span class="icon">📭</span><p>Nessuna prenotazione trovata.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = '<div class="prenot-grid" id="prenotGrid"></div>';
+  const grid = document.getElementById('prenotGrid');
+
+  filteredPrenotazioni.forEach((p, idx) => {
+    const card = document.createElement('div');
+    card.className = 'prenot-card';
+    card.id = `card-${idx}`;
+
+    const slot = CONFIG.SLOTS[p.orario] || { nome: p.orario || '—', emoji: '⏰' };
+    const tipoIcon = CONFIG.TIPO_ICONS[p.tipo] || '🎪';
+    const tipoClass = p.tipo === 'pizzata' ? 'pizzata' : p.tipo === 'evento_privato' ? 'evento' : p.tipo === 'pacchetto_gioco' ? 'gioco' : 'compleanno';
+    const dataF = p.data ? new Date(p.data + 'T12:00:00').toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    const statoClass = p.stato === 'confermata' ? 'confermata' : p.stato === 'annullata' ? 'annullata' : 'attesa';
+
+    card.innerHTML = `
+      <div class="prenot-icon ${tipoClass}">${tipoIcon}</div>
+      <div class="prenot-main">
+        <div class="prenot-nome">${p.nome}</div>
+        <div class="prenot-meta">
+          <strong>${dataF}</strong> · ${slot.emoji} ${slot.nome}
+          ${p.partecipanti ? ` · 👥 ${p.partecipanti}` : ''}
+        </div>
+        ${p.telefono ? `<div class="prenot-meta">📞 ${p.telefono}</div>` : ''}
+      </div>
+      <div class="prenot-right">
+        <span class="badge ${statoClass}">${p.stato.replace('_', ' ')}</span>
+        <div class="prenot-slot">${p.email || ''}</div>
+      </div>
+      <div class="prenot-detail">
+        <div class="detail-row"><span class="dk">Tipo</span><br><span class="dv">${tipoIcon} ${p.tipo.replace('_',' ')}</span></div>
+        <div class="detail-row"><span class="dk">Data</span><br><span class="dv">${dataF}</span></div>
+        <div class="detail-row"><span class="dk">Orario</span><br><span class="dv">${slot.emoji} ${slot.nome} ${slot.orario || ''}</span></div>
+        <div class="detail-row"><span class="dk">Partecipanti</span><br><span class="dv">${p.partecipanti || '—'}</span></div>
+        ${p.festeggiato ? `<div class="detail-row"><span class="dk">Festeggiato</span><br><span class="dv">${p.festeggiato}</span></div>` : ''}
+        ${p.note ? `<div class="detail-row" style="grid-column:1/-1"><span class="dk">Note</span><br><span class="dv">${p.note}</span></div>` : ''}
+        <div class="detail-actions">
+          ${p.stato !== 'confermata' ? `<button class="action-btn confirm" onclick="cambiaStato(${idx}, 'confermata', event)">✅ Conferma</button>` : ''}
+          ${p.stato !== 'annullata' ? `<button class="action-btn cancel" onclick="cambiaStato(${idx}, 'annullata', event)">❌ Annulla</button>` : ''}
+          ${p.telefono ? `<a href="tel:${p.telefono}" class="action-btn call" onclick="event.stopPropagation()">📞 Chiama</a>` : ''}
+          ${p.email ? `<a href="mailto:${p.email}" class="action-btn email" onclick="event.stopPropagation()">✉️ Email</a>` : ''}
+        </div>
+      </div>
+    `;
+
+    card.onclick = (e) => {
+      if (e.target.closest('.action-btn, a')) return;
+      card.classList.toggle('expanded');
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+function cambiaStato(idx, nuovoStato, e) {
+  e.stopPropagation();
+  filteredPrenotazioni[idx].stato = nuovoStato;
+  // Trova nel array principale e aggiorna
+  const p = filteredPrenotazioni[idx];
+  const mainIdx = allPrenotazioni.findIndex(a => a.id === p.id);
+  if (mainIdx !== -1) allPrenotazioni[mainIdx].stato = nuovoStato;
+  updateStats();
+  renderLista();
+  showToast(`Stato aggiornato: ${nuovoStato}`);
+  // TODO: sync con Sheets via webhook
+}
+
+// ============================================================
+// CALENDARIO DASHBOARD
+// ============================================================
+const GIORNI_HDR = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+
+function renderDashCalendar() {
+  document.getElementById('dashCalMonth').textContent = `${CONFIG.MESI[dashMonth]} ${dashYear}`;
+  const grid = document.getElementById('dashCalGrid');
+  grid.innerHTML = '';
+
+  GIORNI_HDR.forEach(g => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-hdr';
+    el.textContent = g;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(dashYear, dashMonth, 1).getDay();
+  const daysInMonth = new Date(dashYear, dashMonth + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const GIORNI_APERTI = [0, 3, 4, 5, 6];
+
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-cell empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${dashYear}-${String(dashMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const date = new Date(dashYear, dashMonth, d);
+    const el = document.createElement('div');
+
+    const dayPren = allPrenotazioni.filter(p => p.data === dateStr);
+    const isOpen = GIORNI_APERTI.includes(date.getDay());
+    const isToday = date.getTime() === today.getTime();
+
+    el.className = `cal-cell${!isOpen ? ' disabled' : ''}${isToday ? ' today' : ''}${dayPren.length > 0 ? ' has-events' : ''}`;
+
+    let dotsHTML = '';
+    if (dayPren.length > 0) {
+      const bySlot = {};
+      dayPren.forEach(p => {
+        if (!bySlot[p.orario]) bySlot[p.orario] = 0;
+        bySlot[p.orario]++;
+      });
+      Object.entries(bySlot).forEach(([slot, cnt]) => {
+        const s = CONFIG.SLOTS[slot] || { emoji: '🎪', nome: slot };
+        dotsHTML += `<div class="cal-event-dot ${slot === 'pizzata' ? 'pizzata' : ''}">${s.emoji} ${cnt} pren.</div>`;
+      });
+    }
+
+    el.innerHTML = `<div class="cal-cell-day">${d}</div>${dotsHTML}`;
+
+    if (isOpen) {
+      el.onclick = () => showDayDetail(dateStr, dayPren, el);
+    }
+
+    grid.appendChild(el);
+  }
+}
+
+function showDayDetail(dateStr, prenList, el) {
+  document.querySelectorAll('.cal-cell.selected').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const detail = document.getElementById('dayDetail');
+  const title = document.getElementById('dayDetailTitle');
+  const content = document.getElementById('dayDetailContent');
+  detail.style.display = 'block';
+
+  const dateF = new Date(dateStr + 'T12:00:00').toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  title.textContent = `📅 ${dateF}`;
+
+  // Slot overview
+  let slotHTML = '<div class="slot-overview"><div class="slot-ov-title">Disponibilità Slot</div>';
+  Object.entries(CONFIG.SLOTS).forEach(([id, slot]) => {
+    const occ = prenList.filter(p => p.orario === id).length;
+    const pct = Math.round((occ / 3) * 100);
+    const color = occ >= 3 ? '#FF6B6B' : occ >= 2 ? '#FFB800' : '#22C55E';
+    slotHTML += `
+      <div class="slot-row">
+        <span class="slot-info">${slot.emoji} ${slot.nome}</span>
+        <div class="slot-bar-wrap"><div class="slot-bar" style="width:${pct}%;background:${color}"></div></div>
+        <span class="slot-count">${occ}/3</span>
+      </div>`;
+  });
+  slotHTML += '</div>';
+
+  // Prenotazioni del giorno
+  if (prenList.length === 0) {
+    slotHTML += '<div class="empty-state" style="padding:30px"><span class="icon">📭</span><p>Nessuna prenotazione per questa data.</p></div>';
+  } else {
+    slotHTML += '<div class="prenot-grid">';
+    prenList.forEach((p, idx) => {
+      const slot = CONFIG.SLOTS[p.orario] || { emoji: '⏰', nome: p.orario };
+      const statoClass = p.stato === 'confermata' ? 'confermata' : p.stato === 'annullata' ? 'annullata' : 'attesa';
+      slotHTML += `
+        <div class="prenot-card" style="grid-template-columns: auto 1fr auto">
+          <div class="prenot-icon compleanno">${CONFIG.TIPO_ICONS[p.tipo] || '🎪'}</div>
+          <div class="prenot-main">
+            <div class="prenot-nome">${p.nome}</div>
+            <div class="prenot-meta">${slot.emoji} ${slot.nome} · 👥 ${p.partecipanti || '?'}</div>
+            ${p.telefono ? `<div class="prenot-meta">📞 ${p.telefono}</div>` : ''}
+          </div>
+          <div class="prenot-right">
+            <span class="badge ${statoClass}">${p.stato.replace('_',' ')}</span>
+          </div>
+        </div>`;
+    });
+    slotHTML += '</div>';
+  }
+
+  content.innerHTML = slotHTML;
+}
+
+function dashPrevMonth() {
+  if (dashMonth === 0) { dashMonth = 11; dashYear--; }
+  else dashMonth--;
+  renderDashCalendar();
+}
+function dashNextMonth() {
+  if (dashMonth === 11) { dashMonth = 0; dashYear++; }
+  else dashMonth++;
+  renderDashCalendar();
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabLista').style.display = tab === 'lista' ? 'block' : 'none';
+  document.getElementById('tabCalendario').style.display = tab === 'calendario' ? 'block' : 'none';
+  if (tab === 'calendario') renderDashCalendar();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadData();
+// Auto-refresh ogni 2 minuti
+setInterval(loadData, 120000);
+</script>
+</body>
+</html>
