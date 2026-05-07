@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙️ Studio · Sunny on the Rainbow</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & ROOT ─── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0E0E12;
+  --bg2: #15151C;
+  --bg3: #1C1C28;
+  --line: rgba(255,255,255,0.07);
+  --line2: rgba(255,255,255,0.12);
+  --txt: #EEEEF4;
+  --sub: rgba(238,238,244,0.45);
+  --coral: #FF6B6B;
+  --sun: #FFB800;
+  --mint: #4ECDC4;
+  --gr: #22C55E;
+  --pu: #A78BFA;
+  --sky: #38BDF8;
+  --accent: var(--coral);
+  --r: 12px;
+}
+html { height: 100%; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--txt); min-height: 100vh; display: grid; grid-template-rows: 56px 1fr; overflow: hidden; }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; gap: 16px; position: relative; z-index: 50;
+}
+.topbar-logo { font-family: 'Fraunces', serif; font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: var(--txt); display: flex; align-items: center; gap: 8px; }
+.topbar-logo span { color: var(--coral); }
+.topbar-tabs { display: flex; gap: 2px; }
+.ttab { padding: 8px 16px; border-radius: 8px; border: none; background: none; color: var(--sub); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; }
+.ttab.active { background: rgba(255,255,255,0.08); color: var(--txt); }
+.ttab:hover:not(.active) { color: var(--txt); }
+.topbar-right { display: flex; gap: 8px; align-items: center; }
+.gen-btn { background: var(--coral); color: white; border: none; padding: 9px 20px; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .2s; white-space: nowrap; }
+.gen-btn:hover { opacity: .88; }
+.preview-link { background: rgba(255,255,255,.06); border: 1px solid var(--line2); color: var(--txt); padding: 8px 14px; border-radius: 9px; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background .2s; }
+.preview-link:hover { background: rgba(255,255,255,.1); }
+
+/* ─── MAIN LAYOUT ─── */
+.studio { display: grid; grid-template-columns: 260px 1fr 320px; height: calc(100vh - 56px); overflow: hidden; }
+
+/* ─── LEFT NAV ─── */
+.leftnav { background: var(--bg2); border-right: 1px solid var(--line); overflow-y: auto; padding: 16px 0; }
+.nav-section { font-size: 10px; font-weight: 600; color: var(--sub); text-transform: uppercase; letter-spacing: 1.5px; padding: 12px 20px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--sub); border-left: 2px solid transparent; transition: all .15s; }
+.nav-item:hover { color: var(--txt); background: rgba(255,255,255,.04); }
+.nav-item.active { color: var(--txt); border-left-color: var(--coral); background: rgba(255,107,107,.08); }
+.nav-item .ico { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+
+/* ─── CENTER CONTENT ─── */
+.center { overflow-y: auto; padding: 28px; }
+.center::-webkit-scrollbar { width: 4px; }
+.center::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 2px; }
+
+.section { display: none; }
+.section.active { display: block; animation: fadein .2s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.sec-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+.sec-desc { font-size: 13px; color: var(--sub); margin-bottom: 28px; line-height: 1.6; }
+
+/* ─── BLOCKS ─── */
+.block { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r); margin-bottom: 16px; overflow: hidden; }
+.block-head { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.block-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--sub); }
+.block-body { padding: 18px; }
+
+/* ─── FORM ELEMENTS ─── */
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+.label { display: block; font-size: 11px; font-weight: 600; color: var(--sub); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.inp, .sel, .ta {
+  width: 100%; background: var(--bg3); border: 1px solid var(--line2);
+  color: var(--txt); padding: 10px 13px; border-radius: 9px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+  transition: border-color .2s;
+}
+.inp:focus, .sel:focus, .ta:focus { border-color: var(--coral); }
+.inp::placeholder, .ta::placeholder { color: var(--sub); }
+.ta { resize: vertical; min-height: 80px; line-height: 1.5; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+@media(max-width:1400px) { .grid3 { grid-template-columns: 1fr 1fr; } }
+
+/* ─── COLOR PICKER ─── */
+.color-row { display: flex; align-items: center; gap: 10px; }
+.color-swatch { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--line2); cursor: pointer; flex-shrink: 0; transition: transform .15s; position: relative; overflow: hidden; }
+.color-swatch:hover { transform: scale(1.08); }
+.color-swatch input[type=color] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border: none; padding: 0; }
+.color-val { flex: 1; }
+
+/* ─── TOGGLE ─── */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.toggle-row:last-child { border: none; }
+.toggle-info .tl { font-size: 13px; font-weight: 500; }
+.toggle-info .ts { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.tog { position: relative; width: 38px; height: 21px; flex-shrink: 0; }
+.tog input { opacity: 0; width: 0; height: 0; }
+.tog-slider { position: absolute; inset: 0; background: rgba(255,255,255,.12); border-radius: 21px; cursor: pointer; transition: .25s; }
+.tog-slider::before { content: ''; position: absolute; width: 15px; height: 15px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .25s; }
+.tog input:checked + .tog-slider { background: var(--gr); }
+.tog input:checked + .tog-slider::before { transform: translateX(17px); }
+
+/* ─── FONT PICKER ─── */
+.font-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.font-card { border: 1.5px solid var(--line2); border-radius: 10px; padding: 12px 10px; cursor: pointer; text-align: center; transition: all .2s; }
+.font-card:hover { border-color: rgba(255,255,255,.25); }
+.font-card.active { border-color: var(--coral); background: rgba(255,107,107,.08); }
+.font-card .fp { font-size: 18px; font-weight: 700; color: var(--txt); line-height: 1.1; margin-bottom: 4px; }
+.font-card .fn { font-size: 10px; color: var(--sub); text-transform: uppercase; letter-spacing: .5px; }
+
+/* ─── GRADIENT BUILDER ─── */
+.grad-preview { height: 80px; border-radius: 10px; margin-bottom: 12px; transition: background .3s; }
+.grad-stops { display: flex; gap: 8px; }
+.grad-stop { flex: 1; }
+
+/* ─── SLOT EDITOR ─── */
+.slot-card { background: var(--bg3); border: 1px solid var(--line2); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+.slot-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.slot-em-inp { width: 48px; height: 48px; background: rgba(255,255,255,.06); border: 1.5px solid var(--line2); border-radius: 10px; text-align: center; font-size: 22px; color: var(--txt); font-family: 'DM Sans', sans-serif; outline: none; cursor: pointer; }
+.slot-em-inp:focus { border-color: var(--coral); }
+.add-slot-btn { width: 100%; padding: 10px; border-radius: 9px; border: 1.5px dashed var(--line2); background: none; color: var(--sub); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; }
+.add-slot-btn:hover { border-color: var(--coral); color: var(--coral); }
+.del-btn { background: rgba(255,107,107,.12); border: none; color: var(--coral); width: 28px; height: 28px; border-radius: 7px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s; margin-left: auto; }
+.del-btn:hover { background: rgba(255,107,107,.25); }
+
+/* ─── EVENT TYPES ─── */
+.etype-card { background: var(--bg3); border: 1px solid var(--line2); border-radius: 10px; padding: 14px; margin-bottom: 10px; display: grid; grid-template-columns: 48px 1fr 1fr 28px; gap: 10px; align-items: center; }
+
+/* ─── EXTRA FIELDS ─── */
+.xfield { background: var(--bg3); border: 1px solid var(--line2); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.xfield-icon { font-size: 18px; flex-shrink: 0; }
+.xfield-info { flex: 1; min-width: 0; }
+.xfield-name { font-size: 13px; font-weight: 600; }
+.xfield-type { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.xfield-actions { display: flex; gap: 6px; }
+
+/* ─── RIGHT PREVIEW ─── */
+.rightpanel { background: var(--bg2); border-left: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
+.rp-head { padding: 14px 18px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.rp-title { font-size: 12px; font-weight: 600; color: var(--sub); text-transform: uppercase; letter-spacing: .8px; }
+.rp-tabs { display: flex; gap: 2px; }
+.rptab { padding: 5px 10px; border-radius: 6px; border: none; background: none; color: var(--sub); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: all .2s; }
+.rptab.active { background: rgba(255,255,255,.08); color: var(--txt); }
+.rp-content { flex: 1; overflow-y: auto; padding: 16px; }
+.code-block { background: var(--bg3); border: 1px solid var(--line); border-radius: 10px; padding: 14px; font-family: 'Courier New', monospace; font-size: 11.5px; color: #79C0FF; line-height: 1.6; overflow-x: auto; white-space: pre; max-height: 300px; overflow-y: auto; }
+.copy-btn { background: rgba(255,255,255,.06); border: 1px solid var(--line2); color: var(--txt); padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 8px; width: 100%; transition: background .2s; font-family: 'DM Sans', sans-serif; }
+.copy-btn:hover { background: rgba(255,255,255,.1); }
+.mini-preview { background: var(--bg3); border-radius: 10px; overflow: hidden; }
+.mp-hero { height: 90px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; transition: background .3s; }
+.mp-hero-title { font-size: 14px; font-weight: 800; color: white; }
+.mp-hero-sub { font-size: 10px; color: rgba(255,255,255,.8); }
+.mp-badges { display: flex; gap: 5px; padding: 8px 10px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.mp-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; background: rgba(255,255,255,.1); color: white; }
+.mp-body { padding: 10px; }
+.mp-steps { display: flex; justify-content: center; gap: 6px; padding: 8px 0; }
+.mp-step { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; }
+.mp-step.active { background: var(--coral); color: white; }
+.mp-card { background: rgba(255,255,255,.05); border-radius: 8px; padding: 10px; margin-top: 8px; }
+.mp-card-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+.mp-tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mp-tipo { border: 1.5px solid rgba(255,255,255,.1); border-radius: 7px; padding: 8px; text-align: center; font-size: 16px; }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--gr); color: white; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; transform: translateY(80px); opacity: 0; transition: all .3s; z-index: 9999; }
+.toast.on { transform: translateY(0); opacity: 1; }
+
+/* ─── SCROLLBAR ─── */
+.leftnav::-webkit-scrollbar, .rp-content::-webkit-scrollbar { width: 3px; }
+.leftnav::-webkit-scrollbar-thumb, .rp-content::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">⚙️ <span>Studio</span> · Sunny</div>
+  <div class="topbar-tabs">
+    <button class="ttab active" onclick="switchPage('prenota',this)">📅 Prenota</button>
+    <button class="ttab" onclick="switchPage('dashboard',this)">📊 Dashboard</button>
+  </div>
+  <div class="topbar-right">
+    <button class="preview-link" onclick="refreshPreview()">👁 Anteprima</button>
+    <button class="gen-btn" onclick="generateAll()">✨ Genera Codice</button>
+  </div>
+</div>
+
+<!-- STUDIO -->
+<div class="studio">
+
+  <!-- LEFT NAV -->
+  <div class="leftnav" id="leftnav">
+    <div class="nav-section">Identità</div>
+    <div class="nav-item active" onclick="showSec('brand',this)"><span class="ico">🏠</span> Brand & Testi</div>
+    <div class="nav-item" onclick="showSec('colori',this)"><span class="ico">🎨</span> Colori</div>
+    <div class="nav-item" onclick="showSec('font',this)"><span class="ico">Aa</span> Font & Tipografia</div>
+    <div class="nav-section" id="navPrenota">Pagina Prenota</div>
+    <div class="nav-item" onclick="showSec('slots',this)" id="navSlots"><span class="ico">⏰</span> Slot Orari</div>
+    <div class="nav-item" onclick="showSec('tipi',this)" id="navTipi"><span class="ico">🎪</span> Tipi Evento</div>
+    <div class="nav-item" onclick="showSec('campi',this)" id="navCampi"><span class="ico">📋</span> Campi Extra Form</div>
+    <div class="nav-item" onclick="showSec('chat',this)" id="navChat"><span class="ico">💬</span> Chat AI</div>
+    <div class="nav-section" id="navDash">Dashboard</div>
+    <div class="nav-item" onclick="showSec('dash',this)" id="navDashOpt"><span class="ico">📊</span> Opzioni Dashboard</div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" onclick="showSec('webhook',this)"><span class="ico">🔗</span> Webhook</div>
+    <div class="nav-item" onclick="showSec('export',this)"><span class="ico">📦</span> Esporta</div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+
+    <!-- BRAND -->
+    <div class="section active" id="sec-brand">
+      <div class="sec-title">Brand & Testi</div>
+      <div class="sec-desc">Nome, contatti e testi che appaiono in tutte le pagine.</div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Identità</div></div>
+        <div class="block-body">
+          <div class="grid2">
+            <div class="field"><label class="label">Nome Centro</label><input class="inp" id="b_nome" value="Sunny on the Rainbow"></div>
+            <div class="field"><label class="label">Emoji / Simbolo</label><input class="inp" id="b_emoji" value="🌈" style="font-size:20px;text-align:center"></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label class="label">Telefono</label><input class="inp" id="b_tel" value="351 910 3655"></div>
+            <div class="field"><label class="label">Email</label><input class="inp" id="b_email" value="sunnyeduteca@gmail.com"></div>
+          </div>
+          <div class="field"><label class="label">Indirizzo</label><input class="inp" id="b_addr" value="Via Giacomo Brodolini 3, Vanzaghello (MI)"></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Testi Hero</div></div>
+        <div class="block-body">
+          <div class="field"><label class="label">Titolo principale</label><input class="inp" id="b_title" value="🎉 Prenota la tua Festa!"></div>
+          <div class="field"><label class="label">Sottotitolo</label><input class="inp" id="b_sub" value="Sunny on the Rainbow · Vanzaghello (MI)"></div>
+          <div class="field"><label class="label">Badge Hero (separati da virgola)</label><input class="inp" id="b_badges" value="🎂 Compleanni, 🍕 Pizzate, 🎪 Eventi"></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Orari Apertura</div></div>
+        <div class="block-body">
+          <div class="grid2">
+            <div class="field"><label class="label">Orario mostrato</label><input class="inp" id="b_orario" value="15:30–19:00"></div>
+            <div class="field"><label class="label">Giorni apertura</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="giorniChips">
+                <div class="gc" data-d="1" onclick="togGiorno(this)" style="padding:6px 12px;border:1.5px solid var(--line2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--sub)">Lun</div>
+                <div class="gc" data-d="2" onclick="togGiorno(this)" style="padding:6px 12px;border:1.5px solid var(--line2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--sub)">Mar</div>
+                <div class="gc act" data-d="3" onclick="togGiorno(this)" style="padding:6px 12px;border:1.5px solid var(--coral);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--coral);background:rgba(255,107,107,.1)">Mer</div>
+                <div class="gc act" data-d="4" onclick="togGiorno(this)" style="padding:6px 12px;border:1.5px solid var(--coral);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--coral);background:rgba(255,107,107,.1)">Gio</div>
+                <div class="gc act" data-d="5" onclick="togGiorno(this)" style="padding:6px 12px;border:1.5px solid var(--coral);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--coral);background:rgba(255,107,107,.1)">Ven</div>
+                <div class="gc act" data-d="6" onclick="togGiorno(this)" style="padding:6px 12px;border:1.5px solid var(--coral);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--coral);background:rgba(255,107,107,.1)">Sab</div>
+                <div class="gc act" data-d="0" onclick="togGiorno(this)" style="padding:6px 12px;border:1.5px solid var(--coral);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--coral);background:rgba(255,107,107,.1)">Dom</div>
+              </div>
+            </div>
+          </div>
+          <div class="field"><label class="label">Messaggio post-prenotazione</label><textarea class="ta" id="b_success" style="min-height:60px">La tua richiesta è stata ricevuta. Ti contatteremo entro 24 ore per confermare.</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLORI -->
+    <div class="section" id="sec-colori">
+      <div class="sec-title">Colori</div>
+      <div class="sec-desc">Personalizza la palette di tutte le pagine. Le modifiche si riflettono nell'anteprima in tempo reale.</div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Gradiente Hero</div></div>
+        <div class="block-body">
+          <div class="grad-preview" id="gradPreview"></div>
+          <div class="grad-stops">
+            <div class="grad-stop field"><label class="label">Colore 1</label><div class="color-row"><div class="color-swatch" id="sw_g1"><input type="color" id="c_g1" value="#FF6B6B" oninput="updateGrad()"></div><input class="inp color-val" id="c_g1t" value="#FF6B6B" oninput="syncColor('c_g1','c_g1t')"></div></div>
+            <div class="grad-stop field"><label class="label">Colore 2</label><div class="color-row"><div class="color-swatch" id="sw_g2"><input type="color" id="c_g2" value="#FFB800" oninput="updateGrad()"></div><input class="inp color-val" id="c_g2t" value="#FFB800" oninput="syncColor('c_g2','c_g2t')"></div></div>
+            <div class="grad-stop field"><label class="label">Colore 3</label><div class="color-row"><div class="color-swatch" id="sw_g3"><input type="color" id="c_g3" value="#4ECDC4" oninput="updateGrad()"></div><input class="inp color-val" id="c_g3t" value="#4ECDC4" oninput="syncColor('c_g3','c_g3t')"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Colori Principali</div></div>
+        <div class="block-body">
+          <div class="grid3">
+            <div class="field"><label class="label">Primario (pulsanti, accento)</label><div class="color-row"><div class="color-swatch"><input type="color" id="c_primary" value="#FF6B6B" oninput="updateSwatches()"></div><input class="inp color-val" id="c_primaryt" value="#FF6B6B" oninput="syncColor('c_primary','c_primaryt')"></div></div>
+            <div class="field"><label class="label">Secondario (slot, mint)</label><div class="color-row"><div class="color-swatch"><input type="color" id="c_secondary" value="#4ECDC4" oninput="updateSwatches()"></div><input class="inp color-val" id="c_secondaryt" value="#4ECDC4" oninput="syncColor('c_secondary','c_secondaryt')"></div></div>
+            <div class="field"><label class="label">Successo / Conferma</label><div class="color-row"><div class="color-swatch"><input type="color" id="c_success" value="#22C55E" oninput="updateSwatches()"></div><input class="inp color-val" id="c_successt" value="#22C55E" oninput="syncColor('c_success','c_successt')"></div></div>
+            <div class="field"><label class="label">Sfondo pagina</label><div class="color-row"><div class="color-swatch"><input type="color" id="c_bg" value="#FFF9F0" oninput="updateSwatches()"></div><input class="inp color-val" id="c_bgt" value="#FFF9F0" oninput="syncColor('c_bg','c_bgt')"></div></div>
+            <div class="field"><label class="label">Testo principale</label><div class="color-row"><div class="color-swatch"><input type="color" id="c_text" value="#1A1A2E" oninput="updateSwatches()"></div><input class="inp color-val" id="c_textt" value="#1A1A2E" oninput="syncColor('c_text','c_textt')"></div></div>
+            <div class="field"><label class="label">Bordi / Dividers</label><div class="color-row"><div class="color-swatch"><input type="color" id="c_border" value="#E5E7EB" oninput="updateSwatches()"></div><input class="inp color-val" id="c_bordert" value="#E5E7EB" oninput="syncColor('c_border','c_bordert')"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Temi Predefiniti</div></div>
+        <div class="block-body">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="preset-btn" onclick="applyPreset('rainbow')" style="padding:8px 16px;border-radius:9px;border:1.5px solid var(--line2);background:linear-gradient(90deg,#FF6B6B,#FFB800,#4ECDC4);color:white;font-size:12px;font-weight:700;cursor:pointer">🌈 Rainbow</button>
+            <button class="preset-btn" onclick="applyPreset('ocean')" style="padding:8px 16px;border-radius:9px;border:1.5px solid var(--line2);background:linear-gradient(90deg,#0EA5E9,#6366F1);color:white;font-size:12px;font-weight:700;cursor:pointer">🌊 Ocean</button>
+            <button class="preset-btn" onclick="applyPreset('sunset')" style="padding:8px 16px;border-radius:9px;border:1.5px solid var(--line2);background:linear-gradient(90deg,#F97316,#EC4899);color:white;font-size:12px;font-weight:700;cursor:pointer">🌅 Sunset</button>
+            <button class="preset-btn" onclick="applyPreset('forest')" style="padding:8px 16px;border-radius:9px;border:1.5px solid var(--line2);background:linear-gradient(90deg,#22C55E,#16A34A);color:white;font-size:12px;font-weight:700;cursor:pointer">🌲 Forest</button>
+            <button class="preset-btn" onclick="applyPreset('candy')" style="padding:8px 16px;border-radius:9px;border:1.5px solid var(--line2);background:linear-gradient(90deg,#EC4899,#A78BFA);color:white;font-size:12px;font-weight:700;cursor:pointer">🍬 Candy</button>
+            <button class="preset-btn" onclick="applyPreset('dark')" style="padding:8px 16px;border-radius:9px;border:1.5px solid var(--line2);background:linear-gradient(90deg,#374151,#111827);color:white;font-size:12px;font-weight:700;cursor:pointer">🌑 Dark</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FONT -->
+    <div class="section" id="sec-font">
+      <div class="sec-title">Font & Tipografia</div>
+      <div class="sec-desc">Scegli i font per titoli e testi. I font vengono caricati da Google Fonts.</div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Font Titoli (Headings)</div></div>
+        <div class="block-body">
+          <div class="font-grid" id="fontTitoliGrid">
+            <div class="font-card active" data-font="Baloo 2" data-url="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800" onclick="selFont('titoli',this)"><div class="fp" style="font-family:'Baloo 2',cursive">Abc</div><div class="fn">Baloo 2</div></div>
+            <div class="font-card" data-font="Fraunces" data-url="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900" onclick="selFont('titoli',this)"><div class="fp" style="font-family:'Fraunces',serif">Abc</div><div class="fn">Fraunces</div></div>
+            <div class="font-card" data-font="Syne" data-url="https://fonts.googleapis.com/css2?family=Syne:wght@700;800" onclick="selFont('titoli',this)"><div class="fp" style="font-family:'Syne',sans-serif">Abc</div><div class="fn">Syne</div></div>
+            <div class="font-card" data-font="Playfair Display" data-url="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900" onclick="selFont('titoli',this)"><div class="fp" style="font-family:'Playfair Display',serif">Abc</div><div class="fn">Playfair</div></div>
+            <div class="font-card" data-font="Bebas Neue" data-url="https://fonts.googleapis.com/css2?family=Bebas+Neue" onclick="selFont('titoli',this)"><div class="fp" style="font-family:'Bebas Neue',cursive">ABC</div><div class="fn">Bebas Neue</div></div>
+            <div class="font-card" data-font="Righteous" data-url="https://fonts.googleapis.com/css2?family=Righteous" onclick="selFont('titoli',this)"><div class="fp" style="font-family:'Righteous',cursive">Abc</div><div class="fn">Righteous</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Font Corpo (Body)</div></div>
+        <div class="block-body">
+          <div class="font-grid" id="fontCorpoGrid">
+            <div class="font-card active" data-font="Nunito" data-url="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700" onclick="selFont('corpo',this)"><div class="fp" style="font-family:'Nunito',sans-serif">Abc</div><div class="fn">Nunito</div></div>
+            <div class="font-card" data-font="DM Sans" data-url="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600" onclick="selFont('corpo',this)"><div class="fp" style="font-family:'DM Sans',sans-serif">Abc</div><div class="fn">DM Sans</div></div>
+            <div class="font-card" data-font="Outfit" data-url="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600" onclick="selFont('corpo',this)"><div class="fp" style="font-family:'Outfit',sans-serif">Abc</div><div class="fn">Outfit</div></div>
+            <div class="font-card" data-font="Quicksand" data-url="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700" onclick="selFont('corpo',this)"><div class="fp" style="font-family:'Quicksand',sans-serif">Abc</div><div class="fn">Quicksand</div></div>
+            <div class="font-card" data-font="Poppins" data-url="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600" onclick="selFont('corpo',this)"><div class="fp" style="font-family:'Poppins',sans-serif">Abc</div><div class="fn">Poppins</div></div>
+            <div class="font-card" data-font="Lato" data-url="https://fonts.googleapis.com/css2?family=Lato:wght@400;700" onclick="selFont('corpo',this)"><div class="fp" style="font-family:'Lato',sans-serif">Abc</div><div class="fn">Lato</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Dimensioni</div></div>
+        <div class="block-body grid2">
+          <div class="field"><label class="label">Titolo hero (px)</label><input class="inp" id="f_herosize" type="number" value="52" min="24" max="80"></div>
+          <div class="field"><label class="label">Testo cards (px)</label><input class="inp" id="f_cardsize" type="number" value="15" min="12" max="20"></div>
+          <div class="field"><label class="label">Border radius cards</label><input class="inp" id="f_radius" type="number" value="20" min="0" max="40"></div>
+          <div class="field"><label class="label">Padding bottoni</label><input class="inp" id="f_btnpad" value="16px 24px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLOT -->
+    <div class="section" id="sec-slots">
+      <div class="sec-title">Slot Orari</div>
+      <div class="sec-desc">Aggiungi, modifica o rimuovi gli slot prenotabili. Ogni slot può avere emoji, nome, orario e disponibilità.</div>
+      <div id="slotsContainer"></div>
+      <button class="add-slot-btn" onclick="addSlot()">+ Aggiungi Slot</button>
+    </div>
+
+    <!-- TIPI EVENTO -->
+    <div class="section" id="sec-tipi">
+      <div class="sec-title">Tipi di Evento</div>
+      <div class="sec-desc">Definisci i tipi di evento prenotabili con emoji, nome visibile e ID interno.</div>
+      <div id="tipiContainer"></div>
+      <button class="add-slot-btn" onclick="addTipo()">+ Aggiungi Tipo Evento</button>
+    </div>
+
+    <!-- CAMPI EXTRA -->
+    <div class="section" id="sec-campi">
+      <div class="sec-title">Campi Extra Form</div>
+      <div class="sec-desc">Aggiungi campi personalizzati al form di prenotazione (es. tema festa, allergie, numero bambini).</div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Campi Standard</div></div>
+        <div class="block-body">
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">Nome Festeggiato/a</div><div class="ts">Visibile solo per feste compleanno</div></div><label class="tog"><input type="checkbox" id="cf_fest" checked><span class="tog-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">Email</div><div class="ts">Campo opzionale</div></div><label class="tog"><input type="checkbox" id="cf_email" checked><span class="tog-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">N° Partecipanti</div><div class="ts">Selezione da menu</div></div><label class="tog"><input type="checkbox" id="cf_parti" checked><span class="tog-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">Note / Richieste Speciali</div><div class="ts">Campo testo libero</div></div><label class="tog"><input type="checkbox" id="cf_note" checked><span class="tog-slider"></span></label></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Campi Personalizzati</div><button onclick="addCampo()" style="background:rgba(255,107,107,.15);border:none;color:var(--coral);padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">+ Aggiungi</button></div>
+        <div class="block-body" id="campiContainer">
+          <div style="text-align:center;color:var(--sub);font-size:13px;padding:16px">Nessun campo personalizzato. Clicca "+ Aggiungi" per crearne uno.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT AI -->
+    <div class="section" id="sec-chat">
+      <div class="sec-title">Chat AI</div>
+      <div class="sec-desc">Configura come risponde l'assistente AI nella chat floating della pagina prenota.</div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Personalità</div></div>
+        <div class="block-body">
+          <div class="field"><label class="label">Messaggio di Benvenuto</label><input class="inp" id="ch_welcome" value="Ciao! 👋 Sono l'assistente di Sunny on the Rainbow. Come posso aiutarti?"></div>
+          <div class="field"><label class="label">Istruzioni AI (system prompt aggiuntivo)</label><textarea class="ta" id="ch_system" style="min-height:120px">Rispondi in italiano con tono caldo e familiare, come un amico che conosce bene il posto. Massimo 3-4 frasi. Se non conosci i prezzi, suggerisci di chiamare.</textarea></div>
+          <div class="grid2">
+            <div class="field"><label class="label">Emoji Bot</label><input class="inp" id="ch_emoji" value="🌈" style="font-size:20px;text-align:center;width:80px"></div>
+            <div class="field"><label class="label">Max Parole Risposta</label><input class="inp" id="ch_tokens" type="number" value="400" min="100" max="1000"></div>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Suggerimenti Rapidi</div></div>
+        <div class="block-body" id="suggContainer">
+          <div id="suggList"></div>
+          <button class="add-slot-btn" onclick="addSugg()" style="margin-top:10px">+ Aggiungi Suggerimento</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="section" id="sec-dash">
+      <div class="sec-title">Opzioni Dashboard</div>
+      <div class="sec-desc">Configura la visualizzazione e le funzionalità della dashboard operatore.</div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Colonne Visibili</div></div>
+        <div class="block-body">
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">Telefono</div></div><label class="tog"><input type="checkbox" id="d_tel" checked><span class="tog-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">Email</div></div><label class="tog"><input type="checkbox" id="d_email" checked><span class="tog-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">N° Partecipanti</div></div><label class="tog"><input type="checkbox" id="d_parti" checked><span class="tog-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">Note</div></div><label class="tog"><input type="checkbox" id="d_note" checked><span class="tog-slider"></span></label></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="tl">Timestamp prenotazione</div></div><label class="tog"><input type="checkbox" id="d_ts"><span class="tog-slider"></span></label></div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Comportamento</div></div>
+        <div class="block-body">
+          <div class="field"><label class="label">Auto-refresh ogni</label>
+            <select class="sel" id="d_refresh" style="width:200px">
+              <option value="60000">1 minuto</option>
+              <option value="120000" selected>2 minuti</option>
+              <option value="300000">5 minuti</option>
+              <option value="0">Mai</option>
+            </select>
+          </div>
+          <div class="toggle-row" style="border:none"><div class="toggle-info"><div class="tl">Mostra tab Chat AI</div><div class="ts">Permette di rispondere alle conversazioni</div></div><label class="tog"><input type="checkbox" id="d_chat" checked><span class="tog-slider"></span></label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEBHOOK -->
+    <div class="section" id="sec-webhook">
+      <div class="sec-title">Webhook n8n</div>
+      <div class="sec-desc">URL dei webhook n8n usati dalle pagine HTML.</div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">Endpoint</div></div>
+        <div class="block-body">
+          <div class="field"><label class="label">Base URL</label><input class="inp" id="w_base" value="https://sunnyeduteca.app.n8n.cloud/webhook"></div>
+          <div class="field"><label class="label">Path Prenotazioni</label><input class="inp" id="w_pren" value="prenotazione-compleanno"></div>
+          <div class="field"><label class="label">Path Get Prenotazioni</label><input class="inp" id="w_get" value="get-prenotazioni"></div>
+          <div class="field"><label class="label">Path Chat AI</label><input class="inp" id="w_chat" value="sunny-chat"></div>
+          <div style="background:var(--bg3);border-radius:9px;padding:12px;margin-top:8px;font-size:12px;color:var(--sub);line-height:1.8" id="wPreview"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="section" id="sec-export">
+      <div class="sec-title">Esporta Codice</div>
+      <div class="sec-desc">Copia il blocco CONFIG generato e incollalo nel file HTML corrispondente, sostituendo il blocco <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">const CFG = {…}</code></div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">CONFIG per prenota.html</div></div>
+        <div class="block-body">
+          <div class="code-block" id="codeP">— Clicca "✨ Genera Codice" in alto —</div>
+          <button class="copy-btn" onclick="copyCode('codeP')">📋 Copia CONFIG Prenota</button>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">CONFIG per dashboard.html</div></div>
+        <div class="block-body">
+          <div class="code-block" id="codeD">— Clicca "✨ Genera Codice" in alto —</div>
+          <button class="copy-btn" onclick="copyCode('codeD')">📋 Copia CONFIG Dashboard</button>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block-head"><div class="block-title">CSS Variabili (colori + font)</div></div>
+        <div class="block-body">
+          <div class="code-block" id="codeCSS">— Clicca "✨ Genera Codice" in alto —</div>
+          <button class="copy-btn" onclick="copyCode('codeCSS')">📋 Copia CSS</button>
+        </div>
+      </div>
+      <div style="background:rgba(78,205,196,.08);border:1px solid rgba(78,205,196,.2);border-radius:10px;padding:16px;font-size:13px;color:var(--mint);line-height:1.8">
+        <strong>Come applicare:</strong><br>
+        1. Apri <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px">prenota.html</code> in un editor di testo<br>
+        2. Trova <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px">const CFG = {</code> e sostituisci tutto il blocco fino alla <code>}</code> con "Copia CONFIG Prenota"<br>
+        3. Trova il blocco <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px">:root {</code> nel CSS e sostituiscilo con "Copia CSS"<br>
+        4. Ripeti per <code style="background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px">dashboard.html</code><br>
+        5. Carica i file aggiornati su GitHub Pages
+      </div>
+    </div>
+
+  </div><!-- /center -->
+
+  <!-- RIGHT PANEL -->
+  <div class="rightpanel">
+    <div class="rp-head">
+      <div class="rp-title">Anteprima</div>
+      <div class="rp-tabs">
+        <button class="rptab active" onclick="switchRP('preview',this)">Visual</button>
+        <button class="rptab" onclick="switchRP('css',this)">CSS</button>
+      </div>
+    </div>
+    <div class="rp-content">
+      <div id="rp-preview">
+        <div class="mini-preview">
+          <div class="mp-hero" id="mpHero">
+            <div class="mp-hero-title" id="mpTitle">🎉 Prenota la tua Festa!</div>
+            <div class="mp-hero-sub" id="mpSub">Sunny on the Rainbow · Vanzaghello (MI)</div>
+          </div>
+          <div class="mp-badges" id="mpBadges">
+            <span class="mp-badge">🎂 Compleanni</span>
+            <span class="mp-badge">🍕 Pizzate</span>
+            <span class="mp-badge">🎪 Eventi</span>
+          </div>
+          <div class="mp-steps">
+            <div class="mp-step active">1</div>
+            <div style="width:16px;height:2px;background:rgba(255,255,255,.2);margin:auto"></div>
+            <div class="mp-step">2</div>
+            <div style="width:16px;height:2px;background:rgba(255,255,255,.2);margin:auto"></div>
+            <div class="mp-step">3</div>
+            <div style="width:16px;height:2px;background:rgba(255,255,255,.2);margin:auto"></div>
+            <div class="mp-step">4</div>
+          </div>
+          <div class="mp-body">
+            <div class="mp-card">
+              <div class="mp-card-title" id="mpCardFont">🎪 Che tipo di evento?</div>
+              <div class="mp-tipo-grid" id="mpTipiPrev"></div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;font-size:11px;color:var(--sub);line-height:1.8">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Font titoli</span><span id="prevFontT" style="color:var(--txt)">Baloo 2</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Font corpo</span><span id="prevFontC" style="color:var(--txt)">Nunito</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Colore primario</span><span id="prevColor" style="font-weight:600;color:#FF6B6B">#FF6B6B</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Slot attivi</span><span id="prevSlots" style="color:var(--txt)">3</span></div>
+        </div>
+      </div>
+      <div id="rp-css" style="display:none">
+        <div class="code-block" id="rpCSSCode">/* Generato automaticamente */</div>
+        <button class="copy-btn" onclick="copyCode('rpCSSCode')">📋 Copia</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /studio -->
+
+<script>
+/* ─── STATO ─── */
+let currentPage = 'prenota';
+let fontTitoli = { font: 'Baloo 2', url: 'https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800' };
+let fontCorpo  = { font: 'Nunito',  url: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700' };
+let slots = [
+  { id:'mattino',    em:'🌅', nm:'Mattino',    or:'10:00 – 13:00', st:'10:00', en:'13:00', max:3, active:true },
+  { id:'pomeriggio', em:'☀️', nm:'Pomeriggio', or:'16:30 – 19:00', st:'16:30', en:'19:30', max:3, active:true },
+  { id:'sera',       em:'🌙', nm:'Sera',       or:'19:00 – 22:00', st:'19:00', en:'22:00', max:3, active:true },
+];
+let tipi = [
+  { id:'festa_compleanno', em:'🎂', nm:'Festa di Compleanno', desc:'Celebra con amici e famiglia' },
+  { id:'pizzata',          em:'🍕', nm:'Serata Pizzata',       desc:'Cena in famiglia' },
+  { id:'evento_privato',   em:'🎊', nm:'Evento Privato',       desc:'Riunioni, battesimi…' },
+  { id:'pacchetto_gioco',  em:'🎠', nm:'Pacchetto Gioco',      desc:'Solo accesso al parco' },
+];
+let campiExtra = [];
+let suggerimenti = [
+  '🎂 Come funziona una festa?',
+  '🍕 Avete le pizzate?',
+  '💰 Quanto costa?',
+  '📍 Dove siete?',
+];
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  renderSlots();
+  renderTipi();
+  renderCampi();
+  renderSuggerimenti();
+  updateGrad();
+  updateSwatches();
+  updateWebhookPreview();
+  updateMiniPreview();
+  // Live preview on input changes
+  document.querySelectorAll('.inp,.ta,.sel').forEach(el => {
+    el.addEventListener('input', () => { updateMiniPreview(); updateWebhookPreview(); });
+  });
+});
+
+/* ─── NAV ─── */
+function showSec(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function switchPage(pg, btn) {
+  currentPage = pg;
+  document.querySelectorAll('.ttab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  // Show/hide page-specific nav
+  const isPrenota = pg === 'prenota';
+  ['navSlots','navTipi','navCampi','navChat'].forEach(id => {
+    document.getElementById(id).style.display = isPrenota ? 'flex' : 'none';
+  });
+  document.getElementById('navPrenota').style.display = isPrenota ? 'block' : 'none';
+  document.getElementById('navDash').style.display = !isPrenota ? 'block' : 'none';
+  document.getElementById('navDashOpt').style.display = !isPrenota ? 'flex' : 'none';
+}
+
+function switchRP(id, btn) {
+  document.querySelectorAll('.rptab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rp-preview').style.display = id === 'preview' ? 'block' : 'none';
+  document.getElementById('rp-css').style.display = id === 'css' ? 'block' : 'none';
+  if (id === 'css') updateCSSPreview();
+}
+
+/* ─── GIORNI ─── */
+function togGiorno(el) {
+  el.classList.toggle('act');
+  if (el.classList.contains('act')) {
+    el.style.borderColor = 'var(--coral)'; el.style.color = 'var(--coral)'; el.style.background = 'rgba(255,107,107,.1)';
+  } else {
+    el.style.borderColor = 'var(--line2)'; el.style.color = 'var(--sub)'; el.style.background = '';
+  }
+}
+function getGiorni() {
+  return Array.from(document.querySelectorAll('.gc.act')).map(e => parseInt(e.dataset.d));
+}
+
+/* ─── COLORI ─── */
+function syncColor(pickerId, textId) {
+  const t = document.getElementById(textId);
+  const p = document.getElementById(pickerId);
+  if (t && p) { p.value = t.value; p.style.background = t.value; updateSwatches(); updateGrad(); }
+}
+function updateSwatches() {
+  ['c_primary','c_secondary','c_success','c_bg','c_text','c_border'].forEach(id => {
+    const el = document.getElementById(id);
+    const sw = el.closest('.color-swatch');
+    if (sw) sw.style.background = el.value;
+    const txt = document.getElementById(id+'t');
+    if (txt) txt.value = el.value;
+  });
+  document.getElementById('prevColor').textContent = document.getElementById('c_primary').value;
+  document.getElementById('prevColor').style.color = document.getElementById('c_primary').value;
+  updateMiniPreview();
+}
+function updateGrad() {
+  const g1 = document.getElementById('c_g1').value;
+  const g2 = document.getElementById('c_g2').value;
+  const g3 = document.getElementById('c_g3').value;
+  document.getElementById('gradPreview').style.background = `linear-gradient(135deg, ${g1}, ${g2}, ${g3})`;
+  document.getElementById('sw_g1').style.background = g1;
+  document.getElementById('sw_g2').style.background = g2;
+  document.getElementById('sw_g3').style.background = g3;
+  document.getElementById('c_g1t').value = g1;
+  document.getElementById('c_g2t').value = g2;
+  document.getElementById('c_g3t').value = g3;
+  updateMiniPreview();
+}
+
+/* ─── PRESET TEMI ─── */
+const PRESETS = {
+  rainbow: { g1:'#FF6B6B', g2:'#FFB800', g3:'#4ECDC4', primary:'#FF6B6B', secondary:'#4ECDC4', success:'#22C55E', bg:'#FFF9F0' },
+  ocean:   { g1:'#0EA5E9', g2:'#6366F1', g3:'#38BDF8', primary:'#0EA5E9', secondary:'#6366F1', success:'#22D3EE', bg:'#F0F9FF' },
+  sunset:  { g1:'#F97316', g2:'#EF4444', g3:'#EC4899', primary:'#F97316', secondary:'#EC4899', success:'#84CC16', bg:'#FFF7ED' },
+  forest:  { g1:'#22C55E', g2:'#16A34A', g3:'#65A30D', primary:'#22C55E', secondary:'#65A30D', success:'#22C55E', bg:'#F0FDF4' },
+  candy:   { g1:'#EC4899', g2:'#A78BFA', g3:'#60A5FA', primary:'#EC4899', secondary:'#A78BFA', success:'#34D399', bg:'#FDF4FF' },
+  dark:    { g1:'#374151', g2:'#1F2937', g3:'#111827', primary:'#6366F1', secondary:'#8B5CF6', success:'#10B981', bg:'#111827' },
+};
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  document.getElementById('c_g1').value = p.g1; document.getElementById('c_g2').value = p.g2; document.getElementById('c_g3').value = p.g3;
+  document.getElementById('c_primary').value = p.primary; document.getElementById('c_secondary').value = p.secondary;
+  document.getElementById('c_success').value = p.success; document.getElementById('c_bg').value = p.bg;
+  updateGrad(); updateSwatches(); showToast('✅ Tema applicato: '+name);
+}
+
+/* ─── FONT ─── */
+function selFont(type, el) {
+  const grid = document.getElementById('font'+capitalize(type)+'Grid');
+  grid.querySelectorAll('.font-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const data = { font: el.dataset.font, url: el.dataset.url };
+  if (type === 'titoli') fontTitoli = data;
+  else fontCorpo = data;
+  document.getElementById('prevFont'+capitalize(type[0])).textContent = data.font;
+  updateMiniPreview();
+}
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ─── SLOTS ─── */
+function renderSlots() {
+  const c = document.getElementById('slotsContainer'); c.innerHTML = '';
+  slots.forEach((sl, i) => {
+    const div = document.createElement('div'); div.className = 'slot-card';
+    div.innerHTML = `
+      <div class="slot-card-head">
+        <input class="slot-em-inp" value="${sl.em}" oninput="slots[${i}].em=this.value;updateMiniPreview()" title="Emoji">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;margin-bottom:3px">${sl.nm}</div>
+          <div style="font-size:11px;color:var(--sub)">${sl.or} · max ${sl.max}</div>
+        </div>
+        <label class="tog" title="Attivo"><input type="checkbox" ${sl.active?'checked':''} onchange="slots[${i}].active=this.checked;updateMiniPreview()"><span class="tog-slider"></span></label>
+        <button class="del-btn" onclick="delSlot(${i})">×</button>
+      </div>
+      <div class="grid3">
+        <div class="field"><label class="label">Nome</label><input class="inp" value="${sl.nm}" oninput="slots[${i}].nm=this.value;updateMiniPreview()"></div>
+        <div class="field"><label class="label">ID interno</label><input class="inp" value="${sl.id}" oninput="slots[${i}].id=this.value"></div>
+        <div class="field"><label class="label">Orario (testo)</label><input class="inp" value="${sl.or}" oninput="slots[${i}].or=this.value"></div>
+        <div class="field"><label class="label">Inizio (HH:MM)</label><input class="inp" value="${sl.st}" oninput="slots[${i}].st=this.value" placeholder="10:00"></div>
+        <div class="field"><label class="label">Fine (HH:MM)</label><input class="inp" value="${sl.en}" oninput="slots[${i}].en=this.value" placeholder="13:00"></div>
+        <div class="field"><label class="label">Max prenotazioni</label><input class="inp" type="number" value="${sl.max}" min="1" max="20" oninput="slots[${i}].max=parseInt(this.value)"></div>
+      </div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('prevSlots').textContent = slots.filter(s=>s.active).length;
+}
+function addSlot() {
+  slots.push({ id:'slot_'+Date.now(), em:'🎪', nm:'Nuovo Slot', or:'00:00 – 00:00', st:'00:00', en:'00:00', max:3, active:true });
+  renderSlots(); showToast('Slot aggiunto');
+}
+function delSlot(i) { slots.splice(i, 1); renderSlots(); showToast('Slot rimosso'); }
+
+/* ─── TIPI EVENTO ─── */
+function renderTipi() {
+  const c = document.getElementById('tipiContainer'); c.innerHTML = '';
+  tipi.forEach((t, i) => {
+    const div = document.createElement('div'); div.className = 'slot-card';
+    div.innerHTML = `
+      <div class="slot-card-head">
+        <input class="slot-em-inp" value="${t.em}" oninput="tipi[${i}].em=this.value;updateMiniPreview()">
+        <div style="flex:1"><div style="font-size:13px;font-weight:700">${t.nm}</div></div>
+        <button class="del-btn" onclick="delTipo(${i})">×</button>
+      </div>
+      <div class="grid2">
+        <div class="field"><label class="label">Nome visibile</label><input class="inp" value="${t.nm}" oninput="tipi[${i}].nm=this.value;updateMiniPreview()"></div>
+        <div class="field"><label class="label">ID interno</label><input class="inp" value="${t.id}" oninput="tipi[${i}].id=this.value"></div>
+        <div class="field" style="grid-column:1/-1"><label class="label">Descrizione (sotto il titolo)</label><input class="inp" value="${t.desc}" oninput="tipi[${i}].desc=this.value"></div>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+function addTipo() {
+  tipi.push({ id:'tipo_'+Date.now(), em:'🎉', nm:'Nuovo Evento', desc:'Descrizione breve' });
+  renderTipi(); showToast('Tipo aggiunto');
+}
+function delTipo(i) { tipi.splice(i,1); renderTipi(); }
+
+/* ─── CAMPI EXTRA ─── */
+function renderCampi() {
+  const c = document.getElementById('campiContainer');
+  if (!campiExtra.length) { c.innerHTML = '<div style="text-align:center;color:var(--sub);font-size:13px;padding:16px">Nessun campo personalizzato. Clicca "+ Aggiungi" per crearne uno.</div>'; return; }
+  c.innerHTML = '';
+  campiExtra.forEach((f, i) => {
+    const div = document.createElement('div'); div.className = 'slot-card';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <input class="slot-em-inp" value="${f.em||'📝'}" oninput="campiExtra[${i}].em=this.value">
+        <div style="flex:1;font-size:13px;font-weight:700">${f.label}</div>
+        <label class="tog"><input type="checkbox" ${f.required?'checked':''} onchange="campiExtra[${i}].required=this.checked"><span class="tog-slider"></span></label>
+        <div style="font-size:10px;color:var(--sub);margin-right:4px">Obbligatorio</div>
+        <button class="del-btn" onclick="delCampo(${i})">×</button>
+      </div>
+      <div class="grid3">
+        <div class="field"><label class="label">Etichetta</label><input class="inp" value="${f.label}" oninput="campiExtra[${i}].label=this.value"></div>
+        <div class="field"><label class="label">Placeholder</label><input class="inp" value="${f.placeholder||''}" oninput="campiExtra[${i}].placeholder=this.value"></div>
+        <div class="field"><label class="label">Tipo campo</label>
+          <select class="sel" onchange="campiExtra[${i}].type=this.value">
+            <option value="text" ${f.type==='text'?'selected':''}>Testo breve</option>
+            <option value="textarea" ${f.type==='textarea'?'selected':''}>Testo lungo</option>
+            <option value="number" ${f.type==='number'?'selected':''}>Numero</option>
+            <option value="select" ${f.type==='select'?'selected':''}>Menu a scelta</option>
+            <option value="checkbox" ${f.type==='checkbox'?'selected':''}>Casella spunta</option>
+          </select>
+        </div>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+function addCampo() {
+  campiExtra.push({ em:'📝', label:'Nuovo Campo', placeholder:'Inserisci...', type:'text', required:false });
+  renderCampi();
+}
+function delCampo(i) { campiExtra.splice(i,1); renderCampi(); }
+
+/* ─── SUGGERIMENTI CHAT ─── */
+function renderSuggerimenti() {
+  const c = document.getElementById('suggList'); c.innerHTML = '';
+  suggerimenti.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+    div.innerHTML = `<input class="inp" value="${s}" oninput="suggerimenti[${i}]=this.value" style="flex:1"><button class="del-btn" onclick="delSugg(${i})">×</button>`;
+    c.appendChild(div);
+  });
+}
+function addSugg() { suggerimenti.push('💬 Nuova domanda'); renderSuggerimenti(); }
+function delSugg(i) { suggerimenti.splice(i,1); renderSuggerimenti(); }
+
+/* ─── WEBHOOK PREVIEW ─── */
+function updateWebhookPreview() {
+  const base = document.getElementById('w_base').value;
+  const p1 = document.getElementById('w_pren').value;
+  const p2 = document.getElementById('w_get').value;
+  const p3 = document.getElementById('w_chat').value;
+  document.getElementById('wPreview').innerHTML = `<span style="color:var(--mint)">POST</span> ${base}/${p1}<br><span style="color:var(--mint)">POST</span> ${base}/${p2}<br><span style="color:var(--mint)">POST</span> ${base}/${p3}`;
+}
+
+/* ─── MINI PREVIEW ─── */
+function updateMiniPreview() {
+  const g1 = document.getElementById('c_g1').value;
+  const g2 = document.getElementById('c_g2').value;
+  const g3 = document.getElementById('c_g3').value;
+  const primary = document.getElementById('c_primary').value;
+  const title = document.getElementById('b_title').value;
+  const sub = document.getElementById('b_sub').value;
+  const badges = document.getElementById('b_badges').value.split(',').map(b=>b.trim()).filter(Boolean);
+
+  document.getElementById('mpHero').style.background = `linear-gradient(135deg,${g1},${g2},${g3})`;
+  document.getElementById('mpTitle').textContent = title;
+  document.getElementById('mpSub').textContent = sub;
+
+  const badgesEl = document.getElementById('mpBadges');
+  badgesEl.innerHTML = badges.map(b=>`<span class="mp-badge">${b}</span>`).join('');
+
+  document.querySelector('.mp-step.active').style.background = primary;
+
+  const tp = document.getElementById('mpTipiPrev');
+  tp.innerHTML = tipi.slice(0,4).map(t=>`<div class="mp-tipo" style="border-color:rgba(255,255,255,.15)">${t.em}</div>`).join('');
+
+  document.getElementById('prevSlots').textContent = slots.filter(s=>s.active).length;
+}
+
+function updateCSSPreview() {
+  document.getElementById('rpCSSCode').textContent = generateCSS();
+}
+
+/* ─── GENERA CODICE ─── */
+function generateAll() {
+  document.getElementById('codeP').textContent = generateConfigPrenota();
+  document.getElementById('codeD').textContent = generateConfigDash();
+  document.getElementById('codeCSS').textContent = generateCSS();
+  document.getElementById('rpCSSCode').textContent = generateCSS();
+  showSec('export', document.querySelector('.nav-item:last-of-type'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.onclick?.toString().includes('export')) n.classList.add('active'); });
+  showToast('✅ Codice generato! Vai alla sezione Esporta.');
+}
+
+function generateConfigPrenota() {
+  const base = document.getElementById('w_base').value;
+  const activeSlots = slots.filter(s=>s.active);
+  const giorni = getGiorni();
+  const slotsJS = activeSlots.map(s=>`    {id:'${s.id}',nm:'${s.nm}',em:'${s.em}',or:'${s.or}',st:'${s.st}',en:'${s.en}'}`).join(',\n');
+  return `const CFG={
+  WH_PRENOT:'${base}/${document.getElementById('w_pren').value}',
+  WH_GET:'${base}/${document.getElementById('w_get').value}',
+  WH_CHAT:'${base}/${document.getElementById('w_chat').value}',
+  GIORNI:[${giorni.join(',')}],
+  MAX:${activeSlots[0]?.max||3},
+  SLOTS:[
+${slotsJS}
+  ]
+};`;
+}
+
+function generateConfigDash() {
+  const base = document.getElementById('w_base').value;
+  const slotsJS = slots.filter(s=>s.active).map(s=>`    ${s.id}:{nm:'${s.nm}',em:'${s.em}',or:'${s.or}'}`).join(',\n');
+  const ticoJS = tipi.map(t=>`    ${t.id}:'${t.em}'`).join(',\n');
+  return `const CFG={
+  WH:'${base}',
+  SLOTS:{
+${slotsJS}
+  },
+  TICO:{
+${ticoJS}
+  },
+  MESI:['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
+  APERTI:[${getGiorni().join(',')}]
+};`;
+}
+
+function generateCSS() {
+  const c = {
+    coral: document.getElementById('c_primary').value,
+    mint:  document.getElementById('c_secondary').value,
+    gr:    document.getElementById('c_success').value,
+    bg:    document.getElementById('c_bg').value,
+    text:  document.getElementById('c_text').value,
+    border:document.getElementById('c_border').value,
+    g1:    document.getElementById('c_g1').value,
+    g2:    document.getElementById('c_g2').value,
+    g3:    document.getElementById('c_g3').value,
+  };
+  const heroGrad = `linear-gradient(135deg,${c.g1} 0%,${c.g2} 50%,${c.g3} 100%)`;
+  return `:root{
+  --sun:${c.g2};
+  --coral:${c.coral};
+  --mint:${c.mint};
+  --grass:${c.gr};
+  --bg:${c.bg};
+  --card:#FFFFFF;
+  --text:${c.text};
+  --muted:#6B7280;
+  --border:${c.border};
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+  --radius:${document.getElementById('f_radius').value}px;
+  --font-title:'${fontTitoli.font}',cursive;
+  --font-body:'${fontCorpo.font}',sans-serif;
+}
+.hero{background:${heroGrad};}
+/* Incolla questo blocco :root nel tuo file HTML, dentro il tag <style> */
+/* Font URL da aggiungere nel <head>:
+   ${fontTitoli.url}
+   ${fontCorpo.url}
+*/`;
+}
+
+function refreshPreview() {
+  updateMiniPreview();
+  showToast('Anteprima aggiornata');
+}
+
+/* ─── COPY ─── */
+function copyCode(id) {
+  const t = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(()=>showToast('📋 Copiato!')).catch(()=>{
+    const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('📋 Copiato!');
+  });
+}
+
+/* ─── TOAST ─── */
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'), 3000);
+}
+
+/* ─── INIT GRADIENTE SWATCHES ─── */
+window.addEventListener('load', () => {
+  document.getElementById('sw_g1').style.background = '#FF6B6B';
+  document.getElementById('sw_g2').style.background = '#FFB800';
+  document.getElementById('sw_g3').style.background = '#4ECDC4';
+  updateMiniPreview();
+});
+</script>
+</body>
+</html>
